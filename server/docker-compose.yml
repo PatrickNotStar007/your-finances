@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: your-finances-db
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - your-finances
+
+volumes:
+  postgres_data:
+
+networks:
+  your-finances:
