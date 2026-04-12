@@ -1,19 +1,18 @@
-import express from "express";
-import cors from "cors";
+import express from 'express'
+import cors from 'cors'
 
-import { ENV } from "./config/env";
+import { ENV } from './config/env'
+import userRouter from './routes/user.router'
 
-const app = express();
-const port = 5000;
+const app = express()
+const port = 5000
 
-app.use(cors({ origin: ENV.FRONTEND_URL }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: ENV.FRONTEND_URL }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-app.get("/ping", (req, res) => {
-  res.send({ message: "ok" });
-});
+app.use('/users', userRouter)
 
 app.listen(port, () => {
-  console.log(`Сервер запущен на порту http://localhost:${ENV.PORT}`);
-});
+    console.log(`Сервер запущен на порту http://localhost:${ENV.PORT}`)
+})
