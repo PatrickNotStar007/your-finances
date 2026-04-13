@@ -1,4 +1,5 @@
 import { CreateTransactionDto } from '../dtos/transaction.dto'
+import { NotFoundError } from '../errors/transaction.errors'
 import { prisma } from '../utils/prisma.service'
 
 export const TransactionService = {
@@ -17,5 +18,15 @@ export const TransactionService = {
 
     async getAll(userId: string) {
         return await prisma.transaction.findMany({ where: { userId } })
+    },
+
+    async getById(userId: string, transactionId: string) {
+        const transaction = await prisma.transaction.findUnique({
+            where: { id: transactionId, userId },
+        })
+
+        if (!transaction) throw new NotFoundError()
+
+        return transaction
     },
 }
