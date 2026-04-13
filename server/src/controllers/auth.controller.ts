@@ -6,8 +6,8 @@ import {
     InvalidCredentialError,
     UserAlreadyExistsError,
     UserNotFoundError,
-    RequestValidationError,
 } from '../errors/auth.errors'
+import { RequestValidationError } from '../errors/common.errors'
 
 export const authController = {
     async registration(req: Request, res: Response) {

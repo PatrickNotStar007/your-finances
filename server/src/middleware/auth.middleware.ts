@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { ENV } from '../config/env'
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
     user?: {
         name: string
         id: string
