@@ -14,4 +14,8 @@ export const TransactionService = {
             },
         })
     },
+
+    async getAll(userId: string) {
+        return await prisma.transaction.findMany({ where: { userId } })
+    },
 }

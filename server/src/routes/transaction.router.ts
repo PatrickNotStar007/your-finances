@@ -4,6 +4,7 @@ import { transactionValidate } from '../validation/transaction.validation'
 
 const transactionRouter = Router()
 
+transactionRouter.get('/', transactionController.getAll)
 transactionRouter.post('/', transactionValidate, transactionController.create)
 
 export default transactionRouter

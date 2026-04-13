@@ -17,3 +17,9 @@ export class RequestValidationError extends ExtendedError {
         this.errors = errors.array()
     }
 }
+
+export class UnauthorizedError extends ExtendedError {
+    constructor() {
+        super('Войдите в систему', 403)
+    }
+}
