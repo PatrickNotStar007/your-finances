@@ -1,5 +1,9 @@
 import { CreateTransactionDto } from '../dtos/transaction.dto'
 import { NotFoundError } from '../errors/transaction.errors'
+import {
+    TransactionCreateInput,
+    TransactionUpdateInput,
+} from '../generated/prisma/models'
 import { prisma } from '../utils/prisma.service'
 
 export const transactionService = {
@@ -17,7 +21,10 @@ export const transactionService = {
     },
 
     async getAll(userId: string) {
-        return await prisma.transaction.findMany({ where: { userId } })
+        return await prisma.transaction.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        })
     },
 
     async getById(userId: string, transactionId: string) {
@@ -35,6 +42,19 @@ export const transactionService = {
 
         return await prisma.transaction.delete({
             where: { id: transactionId, userId },
+        })
+    },
+
+    async update(
+        userId: string,
+        transactionId: string,
+        data: TransactionUpdateInput
+    ) {
+        await this.getById(userId, transactionId)
+
+        return await prisma.transaction.update({
+            where: { id: transactionId, userId },
+            data,
         })
     },
 }

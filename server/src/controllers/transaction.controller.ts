@@ -91,9 +91,48 @@ export const transactionController = {
                 transactionId
             )
 
+            return res.status(204).json(transaction)
+        } catch (e) {
+            console.error(e)
+
+            if (e instanceof NotFoundError)
+                return res.status(e.status).json({ message: e.message })
+
+            return res
+                .status(500)
+                .json({ message: 'Внутренняя ошибка сервера' })
+        }
+    },
+
+    async update(req: AuthRequest, res: Response) {
+        try {
+            const errors = validationResult(req)
+
+            if (!errors.isEmpty()) throw new RequestValidationError(errors)
+
+            const userId = getUserId(req)
+            const transactionId = req.params.id as string
+            const updateData = req.body
+
+            if (Object.keys(updateData).length === 0)
+                return res
+                    .status(400)
+                    .json({ message: 'Нет данных для обновления' })
+
+            const transaction = await transactionService.update(
+                userId,
+                transactionId,
+                updateData
+            )
+
             return res.status(200).json(transaction)
         } catch (e) {
             console.error(e)
+
+            if (e instanceof RequestValidationError)
+                return res
+                    .status(e.status)
+                    .json({ message: e.message, errors: e.errors })
 
             if (e instanceof NotFoundError)
                 return res.status(e.status).json({ message: e.message })

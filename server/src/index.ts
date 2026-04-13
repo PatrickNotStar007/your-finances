@@ -7,7 +7,6 @@ import { authMiddleware } from './middleware/auth.middleware'
 import transactionRouter from './routes/transaction.router'
 
 const app = express()
-const port = 5000
 
 app.use(cors({ origin: ENV.FRONTEND_URL }))
 app.use(express.json())
@@ -19,6 +18,6 @@ app.use(authMiddleware)
 
 app.use('/transactions', transactionRouter)
 
-app.listen(port, () => {
+app.listen(ENV.PORT, () => {
     console.log(`Сервер запущен на порту http://localhost:${ENV.PORT}`)
 })
