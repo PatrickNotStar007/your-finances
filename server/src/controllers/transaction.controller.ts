@@ -1,12 +1,12 @@
 import type { Response } from 'express'
 import type { AuthRequest } from '../middleware/auth.middleware'
-import { TransactionService } from '../services/transaction.service'
 import { validationResult } from 'express-validator'
 import {
     RequestValidationError,
     UnauthorizedError,
 } from '../errors/common.errors'
 import { NotFoundError } from '../errors/transaction.errors'
+import { transactionService } from '../services/transaction.service'
 
 const getUserId = (req: AuthRequest) => {
     if (!req.user) throw new UnauthorizedError()
@@ -22,7 +22,7 @@ export const transactionController = {
 
             const userId = getUserId(req)
             const dto = req.body
-            const transaction = await TransactionService.create(userId, dto)
+            const transaction = await transactionService.create(userId, dto)
 
             return res.status(201).json(transaction)
         } catch (e) {
@@ -45,7 +45,7 @@ export const transactionController = {
     async getAll(req: AuthRequest, res: Response) {
         try {
             const userId = getUserId(req)
-            const transactions = await TransactionService.getAll(userId)
+            const transactions = await transactionService.getAll(userId)
 
             return res.status(200).json(transactions)
         } catch (e) {
@@ -64,7 +64,29 @@ export const transactionController = {
         try {
             const userId = getUserId(req)
             const transactionId = req.params.id as string
-            const transaction = await TransactionService.getById(
+            const transaction = await transactionService.getById(
+                userId,
+                transactionId
+            )
+
+            return res.status(200).json(transaction)
+        } catch (e) {
+            console.error(e)
+
+            if (e instanceof NotFoundError)
+                return res.status(e.status).json({ message: e.message })
+
+            return res
+                .status(500)
+                .json({ message: 'Внутренняя ошибка сервера' })
+        }
+    },
+
+    async delete(req: AuthRequest, res: Response) {
+        try {
+            const userId = getUserId(req)
+            const transactionId = req.params.id as string
+            const transaction = await transactionService.delete(
                 userId,
                 transactionId
             )

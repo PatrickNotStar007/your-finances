@@ -2,7 +2,7 @@ import { CreateTransactionDto } from '../dtos/transaction.dto'
 import { NotFoundError } from '../errors/transaction.errors'
 import { prisma } from '../utils/prisma.service'
 
-export const TransactionService = {
+export const transactionService = {
     async create(userId: string, dto: CreateTransactionDto) {
         return await prisma.transaction.create({
             data: {
@@ -28,5 +28,13 @@ export const TransactionService = {
         if (!transaction) throw new NotFoundError()
 
         return transaction
+    },
+
+    async delete(userId: string, transactionId: string) {
+        await this.getById(userId, transactionId)
+
+        return await prisma.transaction.delete({
+            where: { id: transactionId, userId },
+        })
     },
 }
