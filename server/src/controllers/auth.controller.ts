@@ -1,16 +1,12 @@
-import type { Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 import { authService } from '../services/auth.service'
 import { validationResult } from 'express-validator'
-import {
-    InvalidCredentialError,
-    UserAlreadyExistsError,
-    UserNotFoundError,
-} from '../errors/auth.errors'
+
 import { RequestValidationError } from '../errors/common.errors'
 
 export const authController = {
-    async registration(req: Request, res: Response) {
+    async registration(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req)
 
@@ -21,23 +17,11 @@ export const authController = {
 
             return res.status(201).json(user)
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof UserAlreadyExistsError)
-                return res.status(e.status).json({ message: e.message })
-
-            if (e instanceof RequestValidationError)
-                return res
-                    .status(e.status)
-                    .json({ message: e.message, errors: e.errors })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 
-    async login(req: Request, res: Response) {
+    async login(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req)
 
@@ -50,22 +34,7 @@ export const authController = {
 
             return res.json({ token })
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof RequestValidationError)
-                return res
-                    .status(e.status)
-                    .json({ message: e.message, errors: e.errors })
-
-            if (
-                e instanceof InvalidCredentialError ||
-                e instanceof UserNotFoundError
-            )
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 }
