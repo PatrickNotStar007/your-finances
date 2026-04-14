@@ -5,7 +5,7 @@ import {
     emailValidation,
     nameValidation,
     passwordValidation,
-} from '../utils/auth.validation'
+} from '../validation/auth.validation'
 
 const authRouter = Router()
 
