@@ -1,15 +1,11 @@
-import type { Response } from 'express'
+import type { NextFunction, Response } from 'express'
 import type { AuthRequest } from '../middleware/auth.middleware'
 import { validationResult } from 'express-validator'
 import {
     RequestValidationError,
     UnauthorizedError,
 } from '../errors/common.errors'
-import {
-    DateFormatError,
-    DateRangeError,
-    NotFoundError,
-} from '../errors/transaction.errors'
+import { DateFormatError, DateRangeError } from '../errors/transaction.errors'
 import { transactionService } from '../services/transaction.service'
 import {
     CreateTransactionDto,
@@ -23,7 +19,7 @@ const getUserId = (req: AuthRequest) => {
 }
 
 export const transactionController = {
-    async create(req: AuthRequest, res: Response) {
+    async create(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req)
 
@@ -35,23 +31,11 @@ export const transactionController = {
 
             return res.status(201).json(transaction)
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof RequestValidationError)
-                return res
-                    .status(e.status)
-                    .json({ message: e.message, errors: e.errors })
-
-            if (e instanceof UnauthorizedError)
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 
-    async getAll(req: AuthRequest, res: Response) {
+    async getAll(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = getUserId(req)
             const filter: TransactionFilterType = {
@@ -79,22 +63,11 @@ export const transactionController = {
 
             return res.status(200).json(transactions)
         } catch (e) {
-            console.error(e)
-
-            if (
-                e instanceof UnauthorizedError ||
-                e instanceof DateFormatError ||
-                e instanceof DateRangeError
-            )
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 
-    async getById(req: AuthRequest, res: Response) {
+    async getById(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = getUserId(req)
             const transactionId = req.params.id as string
@@ -105,18 +78,11 @@ export const transactionController = {
 
             return res.status(200).json(transaction)
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof NotFoundError)
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 
-    async delete(req: AuthRequest, res: Response) {
+    async delete(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = getUserId(req)
             const transactionId = req.params.id as string
@@ -127,18 +93,11 @@ export const transactionController = {
 
             return res.status(204).json(transaction)
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof NotFoundError)
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 
-    async update(req: AuthRequest, res: Response) {
+    async update(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req)
 
@@ -161,19 +120,7 @@ export const transactionController = {
 
             return res.status(200).json(transaction)
         } catch (e) {
-            console.error(e)
-
-            if (e instanceof RequestValidationError)
-                return res
-                    .status(e.status)
-                    .json({ message: e.message, errors: e.errors })
-
-            if (e instanceof NotFoundError)
-                return res.status(e.status).json({ message: e.message })
-
-            return res
-                .status(500)
-                .json({ message: 'Внутренняя ошибка сервера' })
+            next(e)
         }
     },
 }
