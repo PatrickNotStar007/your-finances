@@ -10,12 +10,12 @@ import {
     DateRangeError,
     NotFoundError,
 } from '../errors/transaction.errors'
-import { filterType, transactionService } from '../services/transaction.service'
+import { transactionService } from '../services/transaction.service'
 import {
     CreateTransactionDto,
     UpdateTransactionDto,
 } from '../dtos/transaction.dto'
-import { TransactionWhereInput } from '../generated/prisma/models'
+import { TransactionFilterType } from '../types/transaction.types'
 
 const getUserId = (req: AuthRequest) => {
     if (!req.user) throw new UnauthorizedError()
@@ -54,7 +54,7 @@ export const transactionController = {
     async getAll(req: AuthRequest, res: Response) {
         try {
             const userId = getUserId(req)
-            const filter: filterType = {
+            const filter: TransactionFilterType = {
                 userId,
                 type: (req.query.type as 'income' | 'expense') || undefined,
                 category: (req.query.category as string) || undefined,

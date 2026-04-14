@@ -4,19 +4,8 @@ import {
     TransactionUpdateInput,
     TransactionWhereInput,
 } from '../generated/prisma/models'
+import { TransactionFilterType } from '../types/transaction.types'
 import { prisma } from '../utils/prisma.service'
-
-export interface filterType {
-    userId: string
-    type?: 'income' | 'expense'
-    category?: string
-    startDate?: string
-    endDate?: string
-    createdAt?: {
-        gte: Date
-        lte: Date
-    }
-}
 
 export const transactionService = {
     async create(userId: string, dto: CreateTransactionDto) {
@@ -32,7 +21,7 @@ export const transactionService = {
         })
     },
 
-    async getAll(filterParams: filterType) {
+    async getAll(filterParams: TransactionFilterType) {
         const userId = filterParams.userId
         const where: TransactionWhereInput = { userId }
 
