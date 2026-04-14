@@ -5,7 +5,6 @@ import {
     RequestValidationError,
     UnauthorizedError,
 } from '../errors/common.errors'
-import { DateFormatError, DateRangeError } from '../errors/transaction.errors'
 import { transactionService } from '../services/transaction.service'
 import {
     CreateTransactionDto,
@@ -45,19 +44,6 @@ export const transactionController = {
                 startDate: (req.query.startDate as string) || undefined,
                 endDate: (req.query.endDate as string) || undefined,
             }
-
-            if (filter.startDate && isNaN(new Date(filter.startDate).getTime()))
-                throw new DateFormatError()
-
-            if (filter.endDate && isNaN(new Date(filter.endDate).getTime()))
-                throw new DateFormatError()
-
-            if (
-                filter.startDate &&
-                filter.endDate &&
-                new Date(filter.startDate) > new Date(filter.endDate)
-            )
-                throw new DateRangeError()
 
             const transactions = await transactionService.getAll(filter)
 

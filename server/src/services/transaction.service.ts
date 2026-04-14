@@ -1,5 +1,9 @@
 import { CreateTransactionDto } from '../dtos/transaction.dto'
-import { NotFoundError } from '../errors/transaction.errors'
+import {
+    DateFormatError,
+    DateRangeError,
+    NotFoundError,
+} from '../errors/transaction.errors'
 import {
     TransactionUpdateInput,
     TransactionWhereInput,
@@ -28,12 +32,22 @@ export const transactionService = {
         if (filterParams.type) where.type = filterParams.type
         if (filterParams.category) where.category = filterParams.category
         if (filterParams.startDate || filterParams.endDate) {
+            const startDate = filterParams.startDate
+            const endDate = filterParams.endDate
+
+            if (
+                (startDate && isNaN(new Date(startDate).getTime())) ||
+                (endDate && isNaN(new Date(endDate).getTime()))
+            )
+                throw new DateFormatError()
+
+            if (startDate && endDate && new Date(startDate) > new Date(endDate))
+                throw new DateRangeError()
+
             where.createdAt = {}
 
-            if (filterParams.startDate)
-                where.createdAt.gte = new Date(filterParams.startDate)
-            if (filterParams.endDate)
-                where.createdAt.lte = new Date(filterParams.endDate)
+            if (startDate) where.createdAt.gte = new Date(startDate)
+            if (endDate) where.createdAt.lte = new Date(endDate)
         }
 
         return await prisma.transaction.findMany({
