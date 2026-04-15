@@ -66,7 +66,7 @@ export const analyticsService = {
             totalIncome: income._sum.amount ?? 0,
             totalExpense: expense._sum.amount ?? 0,
             balance: (income._sum.amount ?? 0) - (expense._sum.amount ?? 0),
-            groupBy,
+            groupByCategory: groupBy,
         }
     },
 }
