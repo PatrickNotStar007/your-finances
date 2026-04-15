@@ -1,14 +1,11 @@
 import { CreateTransactionDto } from '../dtos/transaction.dto'
-import {
-    DateFormatError,
-    DateRangeError,
-    NotFoundError,
-} from '../errors/transaction.errors'
+import { NotFoundError } from '../errors/transaction.errors'
 import {
     TransactionUpdateInput,
     TransactionWhereInput,
 } from '../generated/prisma/models'
 import { TransactionFilterType } from '../types/transaction.types'
+import { validateDateFormat, validateDateRange } from '../utils/helpers'
 import { prisma } from '../utils/prisma.service'
 
 export const transactionService = {
@@ -35,14 +32,8 @@ export const transactionService = {
             const startDate = filterParams.startDate
             const endDate = filterParams.endDate
 
-            if (
-                (startDate && isNaN(new Date(startDate).getTime())) ||
-                (endDate && isNaN(new Date(endDate).getTime()))
-            )
-                throw new DateFormatError()
-
-            if (startDate && endDate && new Date(startDate) > new Date(endDate))
-                throw new DateRangeError()
+            validateDateFormat(startDate, endDate)
+            validateDateRange(startDate, endDate)
 
             where.createdAt = {}
 

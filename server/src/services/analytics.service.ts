@@ -1,4 +1,5 @@
 import { DateFormatError, DateRangeError } from '../errors/transaction.errors'
+import { validateDateFormat, validateDateRange } from '../utils/helpers'
 import { prisma } from '../utils/prisma.service'
 
 export const analyticsService = {
@@ -7,11 +8,6 @@ export const analyticsService = {
         startDateStr?: string,
         endDateStr?: string
     ) {
-        if (startDateStr && isNaN(new Date(startDateStr).getTime()))
-            throw new DateFormatError()
-        if (endDateStr && isNaN(new Date(endDateStr).getTime()))
-            throw new DateFormatError()
-
         let startDate = new Date(
             new Date().getFullYear(),
             new Date().getMonth(),
@@ -19,11 +15,11 @@ export const analyticsService = {
         )
         let endDate = new Date()
 
+        validateDateFormat(startDateStr, endDateStr)
+        validateDateRange(startDateStr, endDateStr)
+
         if (startDateStr) startDate = new Date(startDateStr)
         if (endDateStr) endDate = new Date(endDateStr)
-
-        if (startDate && endDate && startDate > endDate)
-            throw new DateRangeError()
 
         const income = await prisma.transaction.aggregate({
             where: {
