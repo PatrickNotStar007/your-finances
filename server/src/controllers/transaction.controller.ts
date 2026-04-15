@@ -1,21 +1,14 @@
 import type { NextFunction, Response } from 'express'
 import type { AuthRequest } from '../middleware/auth.middleware'
 import { validationResult } from 'express-validator'
-import {
-    RequestValidationError,
-    UnauthorizedError,
-} from '../errors/common.errors'
+import { RequestValidationError } from '../errors/common.errors'
 import { transactionService } from '../services/transaction.service'
 import {
     CreateTransactionDto,
     UpdateTransactionDto,
 } from '../dtos/transaction.dto'
 import { TransactionFilterType } from '../types/transaction.types'
-
-const getUserId = (req: AuthRequest) => {
-    if (!req.user) throw new UnauthorizedError()
-    return req.user.id
-}
+import { getUserId } from '../utils/helpers'
 
 export const transactionController = {
     async create(req: AuthRequest, res: Response, next: NextFunction) {
