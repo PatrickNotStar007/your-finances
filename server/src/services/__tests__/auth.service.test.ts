@@ -1,7 +1,11 @@
 import { prisma } from '../../utils/prisma.service'
 import bcrypt from 'bcrypt'
 import { authService } from '../auth.service'
-import { UserAlreadyExistsError } from '../../errors/auth.errors'
+import {
+    InvalidCredentialError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+} from '../../errors/auth.errors'
 
 jest.mock('bcrypt')
 jest.mock('../../utils/prisma.service', () => ({
@@ -60,6 +64,52 @@ describe('AuthService', () => {
             ).rejects.toThrow(UserAlreadyExistsError)
 
             expect(mockPrismaCreate).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('login', () => {
+        const email = 'test@example.com'
+        const password = 'password123'
+        const mockUser = {
+            id: '1',
+            email,
+            name: 'Test name',
+            passwordHash: 'hashed_password',
+        }
+
+        it('должен успешно войти и вернуть jwt токен', async () => {
+            mockPrismaFindUnique.mockResolvedValue(mockUser)
+            mockBcryptCompaerSync.mockReturnValue(true)
+
+            const token = await authService.login(email, password)
+
+            expect(mockPrismaFindUnique).toHaveBeenCalledWith({
+                where: { email },
+            })
+            expect(mockBcryptCompaerSync).toHaveBeenCalledWith(
+                password,
+                'hashed_password'
+            )
+            expect(token).toEqual(
+                expect.stringMatching(
+                    /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/
+                )
+            )
+        })
+
+        it('должен выбросить UserNotFoundError для несуществующего email', async () => {
+            mockPrismaFindUnique.mockResolvedValue(null)
+            await expect(
+                authService.login('bad@email.ru', 'password')
+            ).rejects.toThrow(UserNotFoundError)
+        })
+
+        it('должен выбросить InvalidCredentialError при неправильном пароле', async () => {
+            mockPrismaFindUnique.mockResolvedValue(mockUser)
+            mockBcryptCompaerSync.mockReturnValue(false)
+            await expect(
+                authService.login('bad@email.ru', 'bad_password')
+            ).rejects.toThrow(InvalidCredentialError)
         })
     })
 })
