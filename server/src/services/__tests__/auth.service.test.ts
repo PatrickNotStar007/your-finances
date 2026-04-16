@@ -1,6 +1,5 @@
 import { prisma } from '../../utils/prisma.service'
 import bcrypt from 'bcrypt'
-import jwt, { sign } from 'jsonwebtoken'
 import { authService } from '../auth.service'
 import {
     InvalidCredentialError,
