@@ -1,5 +1,6 @@
 import { prisma } from '../../utils/prisma.service'
 import bcrypt from 'bcrypt'
+import jwt, { sign } from 'jsonwebtoken'
 import { authService } from '../auth.service'
 import {
     InvalidCredentialError,
@@ -20,7 +21,24 @@ jest.mock('../../utils/prisma.service', () => ({
 const mockPrismaFindUnique = prisma.user.findUnique as jest.Mock
 const mockPrismaCreate = prisma.user.create as jest.Mock
 const mockBcryptHashSync = bcrypt.hashSync as jest.Mock
-const mockBcryptCompaerSync = bcrypt.compareSync as jest.Mock
+const mockBcryptCompareSync = bcrypt.compareSync as jest.Mock
+
+const testData = {
+    validUser: {
+        email: 'test@example.com',
+        name: 'Test User',
+        password: 'password123',
+        passwordHash: 'hashed_password',
+    },
+    anotherUser: {
+        email: 'another@example.com',
+        password: 'anotherpass123',
+    },
+    invalidUser: {
+        email: 'bad@example.com',
+        password: 'badpass123',
+    },
+}
 
 describe('AuthService', () => {
     beforeEach(() => {
@@ -28,15 +46,8 @@ describe('AuthService', () => {
     })
 
     describe('registration', () => {
-        const email = 'test@example.com'
-        const name = 'Test User'
-        const password = 'password123'
-        const mockCreatedUser = {
-            id: '1',
-            email,
-            name,
-            passwordHash: 'hashed_password',
-        }
+        const { email, name, password, passwordHash } = testData.validUser
+        const mockCreatedUser = { email, name, passwordHash }
 
         it('должен успешно создать пользователя, если email не занят', async () => {
             mockPrismaFindUnique.mockResolvedValue(null)
@@ -48,47 +59,41 @@ describe('AuthService', () => {
             expect(mockPrismaFindUnique).toHaveBeenCalledWith({
                 where: { email },
             })
-            expect(mockBcryptHashSync).toHaveBeenCalledTimes(1)
             expect(mockBcryptHashSync).toHaveBeenCalledWith(password, 10)
             expect(mockPrismaCreate).toHaveBeenCalledWith({
-                data: { email, name, passwordHash: 'hashed_password' },
+                data: { email, name, passwordHash },
             })
             expect(result).toEqual(mockCreatedUser)
         })
 
         it('должен выбросить ошибку UserAlreadyExistsError, если email уже занят', async () => {
-            mockPrismaFindUnique.mockResolvedValue({ id: '1', email })
+            mockPrismaFindUnique.mockResolvedValue({ email })
 
             await expect(
-                authService.registration(email, 'name', 'password')
+                authService.registration(email, name, password)
             ).rejects.toThrow(UserAlreadyExistsError)
 
+            expect(mockBcryptHashSync).not.toHaveBeenCalled()
             expect(mockPrismaCreate).not.toHaveBeenCalled()
         })
     })
 
     describe('login', () => {
-        const email = 'test@example.com'
-        const password = 'password123'
-        const mockUser = {
-            id: '1',
-            email,
-            name: 'Test name',
-            passwordHash: 'hashed_password',
-        }
+        const { email, name, password, passwordHash } = testData.validUser
+        const mockUser = { email, name, passwordHash }
 
         it('должен успешно войти и вернуть jwt токен', async () => {
             mockPrismaFindUnique.mockResolvedValue(mockUser)
-            mockBcryptCompaerSync.mockReturnValue(true)
+            mockBcryptCompareSync.mockReturnValue(true)
 
             const token = await authService.login(email, password)
 
             expect(mockPrismaFindUnique).toHaveBeenCalledWith({
                 where: { email },
             })
-            expect(mockBcryptCompaerSync).toHaveBeenCalledWith(
+            expect(mockBcryptCompareSync).toHaveBeenCalledWith(
                 password,
-                'hashed_password'
+                passwordHash
             )
             expect(token).toEqual(
                 expect.stringMatching(
@@ -100,15 +105,22 @@ describe('AuthService', () => {
         it('должен выбросить UserNotFoundError для несуществующего email', async () => {
             mockPrismaFindUnique.mockResolvedValue(null)
             await expect(
-                authService.login('bad@email.ru', 'password')
+                authService.login(
+                    testData.anotherUser.email,
+                    testData.anotherUser.password
+                )
             ).rejects.toThrow(UserNotFoundError)
+            expect(mockBcryptCompareSync).not.toHaveBeenCalled()
         })
 
         it('должен выбросить InvalidCredentialError при неправильном пароле', async () => {
             mockPrismaFindUnique.mockResolvedValue(mockUser)
-            mockBcryptCompaerSync.mockReturnValue(false)
+            mockBcryptCompareSync.mockReturnValue(false)
             await expect(
-                authService.login('bad@email.ru', 'bad_password')
+                authService.login(
+                    testData.invalidUser.email,
+                    testData.invalidUser.password
+                )
             ).rejects.toThrow(InvalidCredentialError)
         })
     })
