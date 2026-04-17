@@ -1,18 +1,35 @@
-import React from 'react'
 import { Link } from 'react-router'
 import ThemeSelector from './ThemeSelector'
+import { CircleDollarSign, PlusIcon } from 'lucide-react'
 
 const Navbar = () => {
+    const isSignedIn = false
+
     return (
         <div className="navbar bg-base-100 shadow-sm">
             <div className="max-w-5xl mx-auto w-full px-4 flex justify-between items-center">
                 <div className="flex-1">
                     <Link to="/" className="btn btn-ghost text-xl">
-                        ТвоиФинансы
+                        <CircleDollarSign className="size-5 text-primary" />
+                        <span className="text-lg font-bold">ТвоиФинансы</span>
                     </Link>
                 </div>
                 <div className="flex gap-2 items-center">
                     <ThemeSelector />
+                    {isSignedIn ? (
+                        <>
+                            <Link to="/" className="btn btn-ghost gap-1">
+                                <PlusIcon className="size-4" />
+                                <span className="hidden sm:inline">
+                                    Добавить транзакцию
+                                </span>
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <button className="btn btn-ghost ">Войти</button>
+                        </>
+                    )}
                 </div>
                 {/* <div className="flex-none">
                     <div className="dropdown dropdown-end">

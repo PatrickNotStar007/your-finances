@@ -21,14 +21,17 @@ const ThemeSelector = () => {
             <div tabIndex={0} role="button" className="btn btn-ghost gap-1">
                 <span className="hidden sm:inline">Тема</span>
             </div>
-
             <ul
                 tabIndex={0}
-                className="dropdown-content menu bg-base-200 rounded-box z-50 w-26 p-2 max-h-96 overflow-y-auto flex-nowrap"
+                className="dropdown-content menu bg-base-200 rounded-box z-50 w-26 p-2 shadow-xl 
+                max-h-96 overflow-y-auto flex-nowrap"
             >
                 {THEMES.map((t) => (
                     <li key={t}>
-                        <button onClick={() => setTheme(t)}>
+                        <button
+                            onClick={() => setTheme(t)}
+                            className={`${theme === t ? 'bg-primary text-primary-content' : ''}`}
+                        >
                             <span>{t}</span>
                         </button>
                     </li>
