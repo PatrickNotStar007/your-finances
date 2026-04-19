@@ -1,6 +1,12 @@
 import { InfoIcon } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router'
+import { useLogin } from '../hooks/auth.hooks'
+
+const AUTH_MODE = {
+    LOGIN: 'login',
+    REGISTER: 'register',
+}
 
 interface AuthFormProps {
     config: {
@@ -18,11 +24,23 @@ const AuthForm = ({ config }: AuthFormProps) => {
         name: '',
         password: '',
     })
-    const [errors, setErrors] = useState({})
-    const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e) => {
+    const isLogin = formType === AUTH_MODE.LOGIN
+    const isRegister = formType === AUTH_MODE.REGISTER
+
+    const loginMutation = useLogin()
+    const isPending = loginMutation.isPending
+    const error = loginMutation.isError
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (isLogin) {
+            loginMutation.mutate({
+                email: formData.email,
+                password: formData.password,
+            })
+        }
     }
 
     return (
@@ -46,12 +64,18 @@ const AuthForm = ({ config }: AuthFormProps) => {
                                 name="email"
                                 value={formData.email}
                                 placeholder="example@mail.com"
-                                className={`input input-bordered w-full 'input-error' : ''}`}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        email: e.target.value,
+                                    })
+                                }
+                                className={'input input-bordered w-full'}
                             />
                         </div>
 
                         {/* имя */}
-                        {formType === 'register' && (
+                        {isRegister && (
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-medium">
@@ -59,10 +83,16 @@ const AuthForm = ({ config }: AuthFormProps) => {
                                     </span>
                                 </label>
                                 <input
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     value={formData.name}
                                     placeholder="мегатрон"
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            name: e.target.value,
+                                        })
+                                    }
                                     className={`input input-bordered w-full 'input-error' : ''}`}
                                 />
                             </div>
@@ -80,46 +110,71 @@ const AuthForm = ({ config }: AuthFormProps) => {
                                 name="password"
                                 value={formData.password}
                                 placeholder="••••••"
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        password: e.target.value,
+                                    })
+                                }
                                 className={`input input-bordered w-full `}
                             />
                         </div>
+
+                        {error && (
+                            <div className="alert alert-error text-sm">
+                                <span>
+                                    {(error as any)?.response?.data?.message ||
+                                        'Неверный email или пароль'}
+                                </span>
+                            </div>
+                        )}
 
                         {/* Кнопка отправки */}
                         <div className="form-control mt-6">
                             <button
                                 type="submit"
-                                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
-                                disabled={loading}
+                                className={`btn btn-primary w-full ${isPending ? 'loading' : ''}`}
+                                disabled={isPending}
                             >
-                                {loading ? 'Вход...' : `${buttonText}`}
+                                {isPending ? 'Вход...' : `${buttonText}`}
                             </button>
                         </div>
                     </form>
 
                     {/* Дополнительная информация */}
-                    {formType === 'login' && (
-                        <>
-                            <div className="divider">или</div>
-                            <div className="text-center">
-                                <p className="text-sm">
-                                    Нет аккаунта?{' '}
+
+                    <div className="divider">или</div>
+                    <div className="text-center">
+                        <p className="text-sm">
+                            {isLogin && (
+                                <>
+                                    <span>Нет аккаунта? </span>
                                     <Link
                                         to="/registration"
                                         className="link link-primary"
                                     >
                                         Зарегистрироваться
                                     </Link>
-                                </p>
-                            </div>
+                                </>
+                            )}
+                            {isRegister && (
+                                <>
+                                    <span>Есть аккаунт? </span>
+                                    <Link
+                                        to="/login"
+                                        className="link link-primary"
+                                    >
+                                        Войти
+                                    </Link>
+                                </>
+                            )}
+                        </p>
+                    </div>
 
-                            <div className="alert alert-info mt-4 text-sm">
-                                <InfoIcon className="w-5 h-5" />
-                                <span>
-                                    Демо: admin@example.com / password123
-                                </span>
-                            </div>
-                        </>
-                    )}
+                    <div className="alert alert-info mt-4 text-sm">
+                        <InfoIcon className="w-5 h-5" />
+                        <span>Демо: admin@example.com / password123</span>
+                    </div>
                 </div>
             </div>
         </div>
