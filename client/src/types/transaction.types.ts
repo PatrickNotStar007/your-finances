@@ -8,7 +8,7 @@ export interface Transaction {
     userId: string
 }
 
-export interface TransactionFilter {
+export interface TransactionsFilter {
     userId: string
     type?: 'income' | 'expense'
     category?: string
