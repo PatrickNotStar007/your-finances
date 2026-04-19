@@ -38,6 +38,6 @@ export const authService = {
         if (!validPassword) throw new InvalidCredentialError()
 
         const token = generateToken(user.name, user.id)
-        return token
+        return { token, userId: user.id, userName: user.name }
     },
 }

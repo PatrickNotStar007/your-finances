@@ -30,9 +30,12 @@ export const authController = {
             }
 
             const { email, password } = req.body
-            const token = await authService.login(email, password)
+            const { token, userId, userName } = await authService.login(
+                email,
+                password
+            )
 
-            return res.json({ token })
+            return res.json({ token, userId, userName })
         } catch (e) {
             next(e)
         }
