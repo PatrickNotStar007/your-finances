@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
     if (!user) return <Navigate to="/login" />
 
-    return <div>ProtectedRoute</div>
+    return children
 }
 
 export default ProtectedRoute

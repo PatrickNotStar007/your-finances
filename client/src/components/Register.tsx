@@ -1,5 +1,13 @@
+import AuthForm from './AuthForm'
+
+const registerProps = {
+    formType: 'register',
+    title: 'Регистрация',
+    buttonText: 'Зарегистрироваться',
+}
+
 const Register = () => {
-    return <div>Register</div>
+    return <AuthForm config={registerProps} />
 }
 
 export default Register

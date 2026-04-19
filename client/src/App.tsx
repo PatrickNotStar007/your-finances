@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import DashboardPage from './pages/DashboardPage'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import Register from './components/Register'
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                         }
                     />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/registration" element={<Register />} />
                     <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </main>

@@ -1,5 +1,13 @@
-const Login = () => {
-    return <div>Login</div>
+import AuthForm from './AuthForm'
+
+const loginProps = {
+    formType: 'login',
+    title: 'Вход в систему',
+    buttonText: 'Войти',
 }
 
-export default Login
+const LoginForm = () => {
+    return <AuthForm config={loginProps} />
+}
+
+export default LoginForm
