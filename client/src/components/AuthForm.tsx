@@ -1,5 +1,5 @@
 import { InfoIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router'
 import { useLogin, useRegister } from '../hooks/auth.hooks'
 import type { ApiError } from '../types/error.types'
@@ -163,7 +163,6 @@ const AuthForm = ({ config }: AuthFormProps) => {
                     </form>
 
                     {/* Дополнительная информация */}
-
                     <div className="divider">или</div>
                     <div className="text-center">
                         <p className="text-sm">
