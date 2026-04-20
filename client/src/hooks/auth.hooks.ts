@@ -1,4 +1,4 @@
-import { useMutation, type MutationFunction } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import type {
     AuthResponse,
     LoginCredentials,
@@ -47,10 +47,8 @@ export const useLogin = () => {
             localStorage.setItem('auth_token', data.token)
             localStorage.setItem('user_name', data.userName)
             localStorage.setItem('user_id', data.userId)
-            navigate('/dashboard')
-            console.log('успешный логин')
+            navigate('/dashboard', { replace: true })
         },
-        onError: (error: any) => console.error('ОШИБКА ЛОГИНА', error),
     })
 }
 
@@ -63,9 +61,7 @@ export const useRegister = () => {
             localStorage.setItem('auth_token', data.token)
             localStorage.setItem('user_name', data.userName)
             localStorage.setItem('user_id', data.userId)
-            navigate('/dashboard')
-            console.log('успешная регистрация')
+            navigate('/dashboard', { replace: true })
         },
-        onError: (error: any) => console.error('ОШИБКА РЕГИСТРАЦИИ', error),
     })
 }

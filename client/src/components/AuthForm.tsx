@@ -1,7 +1,8 @@
 import { InfoIcon } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { useLogin, useRegister } from '../hooks/auth.hooks'
+import type { ApiError } from '../types/error.types'
 
 const AUTH_MODE = {
     LOGIN: 'login',
@@ -30,8 +31,22 @@ const AuthForm = ({ config }: AuthFormProps) => {
 
     const loginMutation = useLogin()
     const registerMutation = useRegister()
-    const isPending = loginMutation.isPending
-    const error = loginMutation.isError
+
+    const currentMutation = isLogin ? loginMutation : registerMutation
+
+    const isPending = currentMutation.isPending
+    const error = currentMutation.error
+
+    const getErrorMessage = () => {
+        if (!error) return null
+
+        if (error) {
+            const axiosError = error as ApiError
+            return axiosError.response?.data.message
+        }
+    }
+
+    const errorMessage = getErrorMessage()
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -129,12 +144,9 @@ const AuthForm = ({ config }: AuthFormProps) => {
                             />
                         </div>
 
-                        {error && (
+                        {errorMessage && (
                             <div className="alert alert-error text-sm">
-                                <span>
-                                    {(error as any)?.response?.data?.message ||
-                                        'Неверный email или пароль'}
-                                </span>
+                                <span>{errorMessage}</span>
                             </div>
                         )}
 
@@ -142,7 +154,7 @@ const AuthForm = ({ config }: AuthFormProps) => {
                         <div className="form-control mt-6">
                             <button
                                 type="submit"
-                                className={`btn btn-primary w-full ${isPending ? 'loading' : ''}`}
+                                className={`btn btn-primary w-full`}
                                 disabled={isPending}
                             >
                                 {isPending ? 'Вход...' : `${buttonText}`}

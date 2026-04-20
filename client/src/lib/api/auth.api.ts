@@ -7,17 +7,11 @@ import { api } from '../axios'
 
 export const authApi = {
     login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-        try {
-            const { data } = await api.post<AuthResponse>(
-                '/auth/login',
-                credentials
-            )
-            console.log(data)
-            return data
-        } catch (e) {
-            console.log(e)
-        }
-        return { token: '', userId: '', userName: '' }
+        const { data } = await api.post<AuthResponse>(
+            '/auth/login',
+            credentials
+        )
+        return data
     },
 
     register: async (
