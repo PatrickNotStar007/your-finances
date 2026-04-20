@@ -1,7 +1,7 @@
 import { InfoIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router'
-import { useLogin } from '../hooks/auth.hooks'
+import { useLogin, useRegister } from '../hooks/auth.hooks'
 
 const AUTH_MODE = {
     LOGIN: 'login',
@@ -29,6 +29,7 @@ const AuthForm = ({ config }: AuthFormProps) => {
     const isRegister = formType === AUTH_MODE.REGISTER
 
     const loginMutation = useLogin()
+    const registerMutation = useRegister()
     const isPending = loginMutation.isPending
     const error = loginMutation.isError
 
@@ -38,6 +39,14 @@ const AuthForm = ({ config }: AuthFormProps) => {
         if (isLogin) {
             loginMutation.mutate({
                 email: formData.email,
+                password: formData.password,
+            })
+        }
+
+        if (isRegister) {
+            registerMutation.mutate({
+                email: formData.email,
+                name: formData.name,
                 password: formData.password,
             })
         }
@@ -171,10 +180,12 @@ const AuthForm = ({ config }: AuthFormProps) => {
                         </p>
                     </div>
 
-                    <div className="alert alert-info mt-4 text-sm">
-                        <InfoIcon className="w-5 h-5" />
-                        <span>Демо: admin@example.com / password123</span>
-                    </div>
+                    {isLogin && (
+                        <div className="alert alert-info mt-4 text-sm">
+                            <InfoIcon className="w-5 h-5" />
+                            <span>Демо: test@example.com / password123</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

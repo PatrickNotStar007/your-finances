@@ -12,6 +12,7 @@ export const authApi = {
                 '/auth/login',
                 credentials
             )
+            console.log(data)
             return data
         } catch (e) {
             console.log(e)
@@ -26,6 +27,8 @@ export const authApi = {
             '/auth/registration',
             credentials
         )
+        console.log(data)
+
         return data
     },
 }
