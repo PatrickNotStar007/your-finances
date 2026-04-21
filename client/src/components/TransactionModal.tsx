@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { Transaction } from '../types/transaction.types'
 import { useAuth } from '../hooks/auth.hooks'
+import { useMutation } from '@tanstack/react-query'
+import { createTransaction } from '../lib/api/transaction.api'
 
 const TransactionModal = () => {
     const { userId } = useAuth()
@@ -16,8 +18,14 @@ const TransactionModal = () => {
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
+        createTransactionMutation.mutate(formData)
         console.log('submit: ', formData)
     }
+
+    const createTransactionMutation = useMutation({
+        mutationFn: async (formData: Transaction) =>
+            await createTransaction(formData),
+    })
 
     return (
         <>
