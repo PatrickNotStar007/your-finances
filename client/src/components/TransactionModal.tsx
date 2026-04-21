@@ -1,91 +1,151 @@
+import { useState } from 'react'
+import type { Transaction } from '../types/transaction.types'
+import { useAuth } from '../hooks/auth.hooks'
+
 const TransactionModal = () => {
+    const { userId } = useAuth()
+
+    const [formData, setFormData] = useState<Transaction>({
+        amount: 0,
+        type: 'income',
+        category: '',
+        createdAt: new Date(),
+        userId: userId || '',
+        comment: '',
+    })
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        console.log('submit: ', formData)
+    }
+
     return (
         <>
             <dialog id="my_modal_2" className="modal">
                 <div className="modal-box">
                     <h3 className="font-bold text-lg">Новая транзакция</h3>
-                    <fieldset className="fieldset p-4">
-                        {/* сумма */}
-                        <label className="label">Сумма</label>
-                        <div>
-                            <input
-                                type="number"
-                                className="input validator"
-                                required
-                                placeholder="100"
-                                min="1"
-                                max="999999999"
-                                title="Must be between be 1 to 10"
-                            />
-                            <p className="validator-hint">
-                                Введите число от 1 до 999999999
-                            </p>
-                        </div>
+                    <form onSubmit={handleSubmit}>
+                        <fieldset className="fieldset p-4">
+                            {/* сумма */}
+                            <label className="label">Сумма</label>
+                            <div>
+                                <input
+                                    type="number"
+                                    className="input validator"
+                                    value={formData.amount}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData,
+                                            amount: parseFloat(e.target.value),
+                                        })
+                                    }}
+                                    required
+                                    placeholder="100"
+                                    min="1"
+                                    max="999999999"
+                                    title="Must be between be 1 to 10"
+                                />
+                                <p className="validator-hint">
+                                    Введите число от 1 до 999999999
+                                </p>
+                            </div>
 
-                        {/* тип */}
-                        <label className="label">Тип</label>
-                        <div>
-                            <select defaultValue="income" className="select">
-                                <option>Доходы</option>
-                                <option>Расходы</option>
-                            </select>
-                        </div>
-                        <label className="label">Категория</label>
-                        <div>
-                            <input
-                                type="text"
-                                className="input validator"
-                                required
-                                placeholder="транспорт"
-                                pattern="[A-Za-z][A-Za-z0-9\-]*"
-                                minLength="3"
-                                maxLength="30"
-                                title="Only letters, numbers or dash"
-                            />
-                            <p className="validator-hint">
-                                Введите от 3 до 30 символов
-                                <br />
-                                (только буквы, числа, тире)
-                            </p>
-                        </div>
+                            {/* тип */}
+                            <label className="label">Тип</label>
+                            <div>
+                                <select
+                                    value={formData.type}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData,
+                                            type: e.target.value as
+                                                | 'income'
+                                                | 'expense',
+                                        })
+                                    }}
+                                    className="select"
+                                >
+                                    <option value="income">Доходы</option>
+                                    <option value="expense">Расходы</option>
+                                </select>
+                            </div>
+                            <label className="label">Категория</label>
+                            <div>
+                                <input
+                                    type="text"
+                                    className="input validator"
+                                    value={formData.category}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            category: e.target.value,
+                                        })
+                                    }
+                                    required
+                                    placeholder="транспорт"
+                                    pattern="[A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9\-]*"
+                                    minLength={3}
+                                    maxLength={30}
+                                    title="только буквы, числа, тире"
+                                />
+                                <p className="validator-hint">
+                                    Введите от 3 до 30 символов
+                                    <br />
+                                    (только буквы, числа, тире)
+                                </p>
+                            </div>
 
-                        {/* дата */}
-                        <label className="label">Дата</label>
-                        <input
-                            type="date"
-                            className="input validator"
-                            required
-                            placeholder="Pick a date in 2025"
-                            min="2025-01-01"
-                            max="2025-12-31"
-                            title="Must be valid URL"
-                        />
-
-                        {/* описание */}
-                        <label className="label">
-                            Описание (необязательно)
-                        </label>
-                        <div>
+                            {/* дата */}
+                            <label className="label">Дата</label>
                             <input
-                                type="text"
+                                type="date"
                                 className="input validator"
+                                value={
+                                    formData.createdAt
+                                        .toISOString()
+                                        .split('T')[0]
+                                }
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        createdAt: new Date(e.target.value),
+                                    })
+                                }
                                 required
-                                placeholder="транспорт"
-                                pattern="[A-Za-z][A-Za-z0-9\-]*"
-                                minLength="3"
-                                maxLength="30"
-                                title="Only letters, numbers or dash"
                             />
-                            <p className="validator-hint">
-                                Введите от 3 до 30 символов
-                                <br />
-                                (только буквы, числа, тире)
-                            </p>
-                        </div>
-                        <button className="btn" type="submit">
-                            Создать
-                        </button>
-                    </fieldset>
+
+                            {/* описание */}
+                            <label className="label">
+                                Описание (необязательно)
+                            </label>
+                            <div>
+                                <input
+                                    type="text"
+                                    className="input validator"
+                                    value={formData.comment}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            comment: e.target.value,
+                                        })
+                                    }
+                                    placeholder="транспорт"
+                                    pattern="[A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9\-]*"
+                                    minLength={3}
+                                    maxLength={30}
+                                    title="Only letters, numbers or dash"
+                                />
+                                <p className="validator-hint">
+                                    Введите от 3 до 30 символов
+                                    <br />
+                                    (только буквы, числа, тире)
+                                </p>
+                            </div>
+                            <button className="btn" type="submit">
+                                Создать
+                            </button>
+                        </fieldset>
+                    </form>
                 </div>
                 <form method="dialog" className="modal-backdrop">
                     <button>close</button>
