@@ -1,9 +1,13 @@
-export const getCurrentUser = () => {
-    const id = localStorage.getItem('user_id')
-    const name = localStorage.getItem('user_name')
-    const token = localStorage.getItem('auth_token')
+import type { AuthResponse } from '../../types/auth.types'
 
-    if (!id || !name || !token) return null
+export const setCredentials = (data: AuthResponse) => {
+    localStorage.setItem('auth_token', data.token)
+    localStorage.setItem('user_name', data.userName)
+    localStorage.setItem('user_id', data.userId)
+}
 
-    return { id, name, token }
+export const clearCredentials = () => {
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_name')
+    localStorage.removeItem('user_id')
 }

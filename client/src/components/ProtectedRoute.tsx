@@ -1,14 +1,14 @@
 import { Navigate } from 'react-router'
-import { getCurrentUser } from '../lib/helpers/auth.helpers'
+import { useAuth } from '../hooks/auth.hooks'
 
 interface ProtectedRouteProps {
     children: React.ReactNode
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const user = getCurrentUser()
+    const { isAuthenticated } = useAuth()
 
-    if (!user) return <Navigate to="/login" />
+    if (!isAuthenticated) return <Navigate to="/login" />
 
     return children
 }
