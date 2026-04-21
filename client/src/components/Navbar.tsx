@@ -1,9 +1,16 @@
 import { Link } from 'react-router'
 import ThemeSelector from './ThemeSelector'
 import { CircleDollarSign, PlusIcon } from 'lucide-react'
+import { useAuth, useLogout } from '../hooks/auth.hooks'
 
 const Navbar = () => {
-    const isSignedIn = false
+    const { isAuthenticated } = useAuth()
+
+    const logout = useLogout()
+
+    const handleLogout = () => {
+        logout.mutate()
+    }
 
     return (
         <div className="navbar bg-base-100 shadow-sm">
@@ -16,7 +23,7 @@ const Navbar = () => {
                 </div>
                 <div className="flex gap-2 items-center">
                     <ThemeSelector />
-                    {isSignedIn ? (
+                    {isAuthenticated ? (
                         <>
                             <Link to="/" className="btn btn-ghost gap-1">
                                 <PlusIcon className="size-4" />
@@ -24,6 +31,12 @@ const Navbar = () => {
                                     Добавить транзакцию
                                 </span>
                             </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="btn btn-ghost"
+                            >
+                                Выйти
+                            </button>
                         </>
                     ) : (
                         <>

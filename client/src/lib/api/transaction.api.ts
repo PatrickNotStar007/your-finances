@@ -3,8 +3,8 @@ import type {
     Transaction,
     TransactionsFilter,
     UpdateTransactionDto,
-} from '../types/transaction.types'
-import { api } from './axios'
+} from '../../types/transaction.types'
+import { api } from '../axios'
 
 export const getTransactions = async (
     filterParams?: TransactionsFilter

@@ -1,6 +1,9 @@
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import Navbar from './components/Navbar'
-import HomePage from './pages/HomePage'
+import DashboardPage from './pages/DashboardPage'
+import Login from './components/Login'
+import ProtectedRoute from './components/ProtectedRoute'
+import Register from './components/Register'
 
 function App() {
     return (
@@ -8,7 +11,17 @@ function App() {
             <Navbar />
             <main className="max-w-5xl m-auto px-4 py-8">
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/registration" element={<Register />} />
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </main>
         </div>
