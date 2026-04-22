@@ -2,8 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { getTransactions } from '../lib/api/transaction.api'
 import TransactionCard from '../components/TransactionCard'
 import { TRANSACTIONS } from '../constants/transaction.constants'
+import DeleteModal from '../components/DeleteModal'
+import { useState } from 'react'
 
 const DashboardPage = () => {
+    const [selectedId, setSelectedId] = useState('')
     const { data, isLoading } = useQuery({
         queryKey: [TRANSACTIONS],
         queryFn: async () => await getTransactions(),
@@ -24,8 +27,10 @@ const DashboardPage = () => {
                         type={t.type}
                         userId={t.userId}
                         comment={t.comment}
+                        setSelectedId={setSelectedId}
                     />
                 ))}
+                <DeleteModal id={selectedId} />
             </div>
         )
     }
