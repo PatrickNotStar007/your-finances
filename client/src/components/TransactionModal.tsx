@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import type { Transaction } from '../types/transaction.types'
-import { useAuth } from '../hooks/auth.hooks'
+import { useAuth } from '../hooks/auth.hook'
 import { useMutation } from '@tanstack/react-query'
 import { createTransaction } from '../lib/api/transaction.api'
 
 const TransactionModal = () => {
     const { userId } = useAuth()
+
+    const [openToast, setOpenToast] = useState(false)
 
     const [formData, setFormData] = useState<Transaction>({
         amount: 0,
@@ -25,6 +27,15 @@ const TransactionModal = () => {
     const createTransactionMutation = useMutation({
         mutationFn: async (formData: Transaction) =>
             await createTransaction(formData),
+        onSuccess: () => {
+            const modal = document.getElementById(
+                'my_modal_2'
+            ) as HTMLDialogElement
+            modal.close()
+
+            setOpenToast(true)
+            setTimeout(() => setOpenToast(false), 3000)
+        },
     })
 
     return (
@@ -137,10 +148,10 @@ const TransactionModal = () => {
                                             comment: e.target.value,
                                         })
                                     }
-                                    placeholder="транспорт"
+                                    // placeholder="транспорт"
                                     pattern="[A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9\-]*"
-                                    minLength={3}
-                                    maxLength={30}
+                                    // minLength={3}
+                                    // maxLength={30}
                                     title="Only letters, numbers or dash"
                                 />
                                 <p className="validator-hint">
@@ -159,6 +170,14 @@ const TransactionModal = () => {
                     <button>close</button>
                 </form>
             </dialog>
+
+            {openToast && (
+                <div id="success_toast" className="toast">
+                    <div className="alert alert-success">
+                        <span>Транзакция успешно создана :)</span>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

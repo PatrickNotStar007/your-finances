@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import ThemeSelector from './ThemeSelector'
 import { CircleDollarSign, PlusIcon } from 'lucide-react'
-import { useAuth, useLogout } from '../hooks/auth.hooks'
+import { useAuth, useLogout } from '../hooks/auth.hook'
 import TransactionModal from './TransactionModal'
 
 const Navbar = () => {
