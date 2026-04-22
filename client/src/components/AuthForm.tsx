@@ -1,7 +1,7 @@
 import { InfoIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router'
-import { useLogin, useRegister } from '../hooks/auth.hooks'
+import { useLogin, useRegister } from '../hooks/auth.hook'
 import type { ApiError } from '../types/error.types'
 
 const AUTH_MODE = {

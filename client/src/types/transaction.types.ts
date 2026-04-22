@@ -1,5 +1,4 @@
 export interface Transaction {
-    id: string
     amount: number
     type: 'income' | 'expense'
     category: string
@@ -20,13 +19,4 @@ export interface TransactionsFilter {
     }
 }
 
-export interface CreateTransactionDto {
-    amount: number
-    type: 'income' | 'expense'
-    category: string
-    createdAt: Date
-    comment?: ''
-    userId: string
-}
-
-export interface UpdateTransactionDto extends Partial<CreateTransactionDto> {}
+export interface UpdateTransactionDto extends Partial<Transaction> {}
