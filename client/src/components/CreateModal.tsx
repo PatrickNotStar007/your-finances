@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import type { Transaction } from '../types/transaction.types'
 import { useAuth } from '../hooks/auth.hook'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createTransaction } from '../lib/api/transaction.api'
+import { TRANSACTIONS } from '../constants/transaction.constants'
+import { closeModal } from '../lib/helpers/dashboard.helpers'
 
 const TransactionModal = () => {
+    const queryClient = useQueryClient()
     const { userId } = useAuth()
 
     const [openToast, setOpenToast] = useState(false)
 
     const [formData, setFormData] = useState<Transaction>({
+        id: '',
         amount: 0,
         type: 'income',
         category: '',
@@ -21,26 +25,22 @@ const TransactionModal = () => {
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
         createTransactionMutation.mutate(formData)
-        console.log('submit: ', formData)
     }
 
     const createTransactionMutation = useMutation({
         mutationFn: async (formData: Transaction) =>
             await createTransaction(formData),
         onSuccess: () => {
-            const modal = document.getElementById(
-                'my_modal_2'
-            ) as HTMLDialogElement
-            modal.close()
-
+            closeModal('create_modal')
             setOpenToast(true)
             setTimeout(() => setOpenToast(false), 3000)
+            queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
         },
     })
 
     return (
         <>
-            <dialog id="my_modal_2" className="modal">
+            <dialog id="create_modal" className="modal">
                 <div className="modal-box">
                     <h3 className="font-bold text-lg">Новая транзакция</h3>
                     <form onSubmit={handleSubmit}>

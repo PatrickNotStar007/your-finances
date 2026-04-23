@@ -57,7 +57,7 @@ export const useLogout = () => {
 }
 
 export const useAuth = () => {
-    const { data: user } = useQuery({
+    const { data: user, isLoading } = useQuery({
         queryKey: AUTH_QUERY_KEY,
         queryFn: () => {
             const token = localStorage.getItem('auth_token')
@@ -70,5 +70,5 @@ export const useAuth = () => {
         },
     })
 
-    return { ...user }
+    return { ...user, isLoading }
 }
