@@ -1,7 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { getSummary } from '../lib/api/summary.api'
+import { useAuth } from '../hooks/auth.hook'
 
 const AnalyticsModal = () => {
+    const { userId } = useAuth()
+    if (!userId) {
+        throw Error
+    }
+
     const [formData, setFormData] = useState<{
         startDate?: Date
         endDate?: Date
@@ -10,14 +17,22 @@ const AnalyticsModal = () => {
         endDate: undefined,
     })
 
-    const summary = useQuery({
-        queryKey: ['summary'],
-        queryFn: ()=>
+    const { data, error, refetch } = useQuery({
+        queryKey: ['summary', userId, formData.startDate, formData.endDate],
+        queryFn: async () =>
+            await getSummary({
+                userId,
+                startDate: formData.startDate?.toISOString(),
+                endDate: formData.endDate?.toISOString(),
+            }),
+        enabled: false,
     })
+
+    if (data) console.log(data)
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(formData)
+        refetch()
     }
 
     return (
