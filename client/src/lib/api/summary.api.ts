@@ -2,20 +2,22 @@ import { api } from '../axios'
 
 interface SummaryParams {
     userId: string
-    startDateStr?: string
-    endDateStr?: string
+    startDate?: string
+    endDate?: string
 }
 
 interface SummaryResponse {
     totalIncome: number
     totalExpense: number
     balance: number
-    // groupByCategory: groupBy
+    groupByCategory: Record<string, number>
 }
 
-export const getSummary = async (summaryParams: SummaryParams) => {
-    const { data } = await api.get<SummaryParams>('/summary', {
+export const getSummary = async (
+    summaryParams: SummaryParams
+): Promise<SummaryResponse> => {
+    const { data } = await api.get<SummaryResponse>('/analytics/summary', {
         params: summaryParams,
     })
-    return { ...data }
+    return data
 }
