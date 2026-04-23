@@ -1,6 +1,6 @@
 import { FilterIcon, ListCheckIcon, PlusIcon } from 'lucide-react'
-import TransactionModal from './CreateModal'
-import AnalyticsModal from './AnalyticsModal'
+import TransactionModal from './modals/CreateModal'
+import AnalyticsModal from './modals/AnalyticsModal'
 import { openModal } from '../lib/helpers/dashboard.helpers'
 
 const ControlPanel = () => {

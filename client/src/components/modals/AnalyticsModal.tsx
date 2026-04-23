@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { getSummary } from '../lib/api/summary.api'
-import { useAuth } from '../hooks/auth.hook'
+import { getSummary } from '../../lib/api/summary.api'
+import { useAuth } from '../../hooks/auth.hook'
+import { closeModal, openModal } from '../../lib/helpers/dashboard.helpers'
+import SummaryModal from './SummaryModal'
 
 const AnalyticsModal = () => {
     const { userId } = useAuth()
@@ -28,11 +30,13 @@ const AnalyticsModal = () => {
         enabled: false,
     })
 
-    if (data) console.log(data)
-
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
-        refetch()
+        if (!error) {
+            closeModal('analytics_modal')
+            refetch()
+            openModal('summary_modal')
+        }
     }
 
     return (
@@ -79,6 +83,22 @@ const AnalyticsModal = () => {
                 <form method="dialog" className="modal-backdrop">
                     <button>close</button>
                 </form>
+                <SummaryModal
+                    balance={1}
+                    totalIncome={2}
+                    totalExpense={3}
+                    // groupByCategory=
+                    startDate={formData.startDate
+                        ?.toLocaleDateString('ru-RU')
+                        .split('.')
+                        .reverse()
+                        .join('.')}
+                    endDate={formData.endDate
+                        ?.toLocaleDateString('ru-RU')
+                        .split('.')
+                        .reverse()
+                        .join('.')}
+                />
             </dialog>
         </>
     )

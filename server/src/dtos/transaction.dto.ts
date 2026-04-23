@@ -3,7 +3,7 @@ export interface CreateTransactionDto {
     type: 'income' | 'expense'
     category: string
     comment?: string
-    date?: Date
+    createdAt?: Date
 }
 
 export interface UpdateTransactionDto {

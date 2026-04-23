@@ -16,7 +16,7 @@ export const transactionService = {
                 category: dto.category,
                 type: dto.type,
                 comment: dto.comment,
-                createdAt: dto.date,
+                createdAt: dto.createdAt,
                 userId,
             },
         })
