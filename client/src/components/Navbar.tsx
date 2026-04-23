@@ -1,12 +1,10 @@
 import { Link } from 'react-router'
 import ThemeSelector from './ThemeSelector'
-import { CircleDollarSign, PlusIcon } from 'lucide-react'
+import { CircleDollarSign } from 'lucide-react'
 import { useAuth, useLogout } from '../hooks/auth.hook'
-import TransactionModal from './CreateModal'
 
 const Navbar = () => {
     const { isAuthenticated } = useAuth()
-
     const logout = useLogout()
 
     const handleLogout = () => {
@@ -23,34 +21,16 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <ThemeSelector />
-                    {isAuthenticated ? (
+                    {isAuthenticated && (
                         <>
-                            <button
-                                className="btn btn-ghost gap-1"
-                                onClick={() => {
-                                    const modal = document.getElementById(
-                                        'my_modal_2'
-                                    ) as HTMLDialogElement
-                                    modal.showModal()
-                                }}
-                            >
-                                <PlusIcon className="size-4" />
-                                <span className="hidden sm:inline">
-                                    Добавить транзакцию
-                                </span>
-                            </button>
-                            <TransactionModal />
+                            <ThemeSelector />
+
                             <button
                                 onClick={handleLogout}
                                 className="btn btn-ghost"
                             >
                                 Выйти
                             </button>
-                        </>
-                    ) : (
-                        <>
-                            <button className="btn btn-ghost ">Войти</button>
                         </>
                     )}
                 </div>

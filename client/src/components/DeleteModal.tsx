@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRANSACTIONS } from '../constants/transaction.constants'
 import { useState } from 'react'
 import { deleteTransaction } from '../lib/api/transaction.api'
+import { closeModal } from '../lib/helpers/dashboard.helpers'
 
 interface DeleteProps {
     id: string
@@ -16,14 +17,9 @@ const DeleteModal = ({ id }: DeleteProps) => {
             await deleteTransaction(id)
         },
         onSuccess: () => {
-            const modal = document.getElementById(
-                'delete_modal'
-            ) as HTMLDialogElement
-            modal.close()
-
+            closeModal('delete_modal')
             setOpenToast(true)
             setTimeout(() => setOpenToast(false), 3000)
-
             queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
         },
         onError: (e) => {
@@ -52,12 +48,7 @@ const DeleteModal = ({ id }: DeleteProps) => {
                     </button>
                     <button
                         className="btn btn-primary"
-                        onClick={() => {
-                            const modal = document.getElementById(
-                                'delete_modal'
-                            ) as HTMLDialogElement
-                            modal?.close()
-                        }}
+                        onClick={() => closeModal('delete_modal')}
                     >
                         Нет
                     </button>

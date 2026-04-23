@@ -30,7 +30,7 @@ const TransactionCard = (props: TransactionCardProps) => {
                         </li>
                         {props.comment && (
                             <li>
-                                <span></span>
+                                <span>{props.comment}</span>
                             </li>
                         )}
                     </ul>

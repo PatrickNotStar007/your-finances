@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/auth.hook'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createTransaction } from '../lib/api/transaction.api'
 import { TRANSACTIONS } from '../constants/transaction.constants'
+import { closeModal } from '../lib/helpers/dashboard.helpers'
 
 const TransactionModal = () => {
     const queryClient = useQueryClient()
@@ -30,21 +31,16 @@ const TransactionModal = () => {
         mutationFn: async (formData: Transaction) =>
             await createTransaction(formData),
         onSuccess: () => {
-            const modal = document.getElementById(
-                'my_modal_2'
-            ) as HTMLDialogElement
-            modal.close()
-
+            closeModal('create_modal')
             setOpenToast(true)
             setTimeout(() => setOpenToast(false), 3000)
-
             queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
         },
     })
 
     return (
         <>
-            <dialog id="my_modal_2" className="modal">
+            <dialog id="create_modal" className="modal">
                 <div className="modal-box">
                     <h3 className="font-bold text-lg">Новая транзакция</h3>
                     <form onSubmit={handleSubmit}>
