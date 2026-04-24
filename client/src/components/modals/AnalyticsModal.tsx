@@ -5,36 +5,57 @@ import { useAuth } from '../../hooks/auth.hook'
 import { closeModal, openModal } from '../../lib/helpers/dashboard.helpers'
 import SummaryModal from './SummaryModal'
 
+interface FormData {
+    startDate?: Date
+    endDate?: Date
+}
+
+interface SummaryData extends FormData {
+    totalIncome: number
+    totalExpense: number
+    balance: number
+    groupByCategory: Record<string, number>
+}
+
 const AnalyticsModal = () => {
     const { userId } = useAuth()
     if (!userId) {
         throw Error
     }
 
-    const [formData, setFormData] = useState<{
-        startDate?: Date
-        endDate?: Date
-    }>({
-        startDate: undefined,
-        endDate: undefined,
-    })
+    const [formData, setFormData] = useState<FormData>({})
+    const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
 
-    const { data, error, refetch } = useQuery({
+    const { refetch } = useQuery({
         queryKey: ['summary', userId, formData.startDate, formData.endDate],
-        queryFn: async () =>
-            await getSummary({
+        queryFn: async () => {
+            const result = await getSummary({
                 userId,
-                startDate: formData.startDate?.toISOString(),
-                endDate: formData.endDate?.toISOString(),
-            }),
+                startDate: formData.startDate?.toString(),
+                endDate: formData.endDate?.toString(),
+            })
+            console.log(result)
+            return result
+        },
         enabled: false,
     })
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!error) {
+
+        const result = await refetch()
+        if (result.data) {
+            const newSummaryData = {
+                balance: result.data.balance,
+                totalIncome: result.data.totalIncome,
+                totalExpense: result.data.totalExpense,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                groupByCategory: result.data.groupByCategory,
+            }
+
+            setSummaryData(newSummaryData)
             closeModal('analytics_modal')
-            refetch()
             openModal('summary_modal')
         }
     }
@@ -52,6 +73,13 @@ const AnalyticsModal = () => {
                             </label>
                             <input
                                 type="date"
+                                value={
+                                    formData.startDate
+                                        ? formData.startDate
+                                              .toISOString()
+                                              .split('T')[0]
+                                        : ''
+                                }
                                 className="input validator mb-1"
                                 onChange={(e) =>
                                     setFormData({
@@ -66,6 +94,13 @@ const AnalyticsModal = () => {
                             </label>
                             <input
                                 type="date"
+                                value={
+                                    formData.endDate
+                                        ? formData.endDate
+                                              .toISOString()
+                                              .split('T')[0]
+                                        : ''
+                                }
                                 className="input validator mb-3"
                                 onChange={(e) =>
                                     setFormData({
@@ -83,23 +118,17 @@ const AnalyticsModal = () => {
                 <form method="dialog" className="modal-backdrop">
                     <button>close</button>
                 </form>
-                <SummaryModal
-                    balance={1}
-                    totalIncome={2}
-                    totalExpense={3}
-                    // groupByCategory=
-                    startDate={formData.startDate
-                        ?.toLocaleDateString('ru-RU')
-                        .split('.')
-                        .reverse()
-                        .join('.')}
-                    endDate={formData.endDate
-                        ?.toLocaleDateString('ru-RU')
-                        .split('.')
-                        .reverse()
-                        .join('.')}
-                />
             </dialog>
+
+            <SummaryModal
+                setFormData={setFormData}
+                balance={summaryData?.balance!}
+                totalIncome={summaryData?.totalIncome!}
+                totalExpense={summaryData?.totalExpense!}
+                groupByCategory={summaryData?.groupByCategory!}
+                startDate={summaryData?.startDate}
+                endDate={summaryData?.endDate}
+            />
         </>
     )
 }
