@@ -19,9 +19,7 @@ interface SummaryData extends FormData {
 
 const AnalyticsModal = () => {
     const { userId } = useAuth()
-    if (!userId) {
-        throw Error
-    }
+    if (!userId) throw new Error('User not authenticated')
 
     const [formData, setFormData] = useState<FormData>({})
     const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
@@ -29,13 +27,11 @@ const AnalyticsModal = () => {
     const { refetch } = useQuery({
         queryKey: ['summary', userId, formData.startDate, formData.endDate],
         queryFn: async () => {
-            const result = await getSummary({
+            return await getSummary({
                 userId,
-                startDate: formData.startDate?.toString(),
-                endDate: formData.endDate?.toString(),
+                startDate: formData.startDate?.toISOString(),
+                endDate: formData.endDate?.toISOString(),
             })
-            console.log(result)
-            return result
         },
         enabled: false,
     })
@@ -45,16 +41,14 @@ const AnalyticsModal = () => {
 
         const result = await refetch()
         if (result.data) {
-            const newSummaryData = {
+            setSummaryData({
                 balance: result.data.balance,
                 totalIncome: result.data.totalIncome,
                 totalExpense: result.data.totalExpense,
                 startDate: formData.startDate,
                 endDate: formData.endDate,
                 groupByCategory: result.data.groupByCategory,
-            }
-
-            setSummaryData(newSummaryData)
+            })
             closeModal('analytics_modal')
             openModal('summary_modal')
         }
@@ -122,10 +116,10 @@ const AnalyticsModal = () => {
 
             <SummaryModal
                 setFormData={setFormData}
-                balance={summaryData?.balance!}
-                totalIncome={summaryData?.totalIncome!}
-                totalExpense={summaryData?.totalExpense!}
-                groupByCategory={summaryData?.groupByCategory!}
+                balance={summaryData?.balance ?? 0}
+                totalIncome={summaryData?.totalIncome ?? 0}
+                totalExpense={summaryData?.totalExpense ?? 0}
+                groupByCategory={summaryData?.groupByCategory ?? {}}
                 startDate={summaryData?.startDate}
                 endDate={summaryData?.endDate}
             />
