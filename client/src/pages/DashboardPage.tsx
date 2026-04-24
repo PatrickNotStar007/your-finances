@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getTransactions } from '../lib/api/transaction.api'
 import TransactionCard from '../components/TransactionCard'
 import { TRANSACTIONS } from '../constants/transaction.constants'
-import DeleteModal from '../components/DeleteModal'
+import DeleteModal from '../components/modals/DeleteModal'
 import { useState } from 'react'
 import ControlPanel from '../components/ControlPanel'
 

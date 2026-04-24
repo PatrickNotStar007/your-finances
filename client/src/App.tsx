@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router'
 import Navbar from './components/Navbar'
 import DashboardPage from './pages/DashboardPage'
-import Login from './components/Login'
+import Login from './components/forms/Login'
 import ProtectedRoute from './components/ProtectedRoute'
-import Register from './components/Register'
+import Register from './components/forms/Register'
 
 function App() {
     return (

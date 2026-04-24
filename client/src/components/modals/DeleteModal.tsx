@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TRANSACTIONS } from '../constants/transaction.constants'
+import { TRANSACTIONS } from '../../constants/transaction.constants'
 import { useState } from 'react'
-import { deleteTransaction } from '../lib/api/transaction.api'
-import { closeModal } from '../lib/helpers/dashboard.helpers'
+import { deleteTransaction } from '../../lib/api/transaction.api'
+import { closeModal } from '../../lib/helpers/dashboard.helpers'
 
 interface DeleteProps {
     id: string

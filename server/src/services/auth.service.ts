@@ -27,7 +27,12 @@ export const authService = {
 
         const passwordHash = bcrypt.hashSync(password, 10)
 
-        return await prisma.user.create({ data: { email, name, passwordHash } })
+        const user = await prisma.user.create({
+            data: { email, name, passwordHash },
+        })
+
+        const token = generateToken(user.name, user.id)
+        return { token, userId: user.id, userName: user.name }
     },
 
     async login(email: string, password: string) {

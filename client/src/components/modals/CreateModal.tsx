@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import type { Transaction } from '../types/transaction.types'
-import { useAuth } from '../hooks/auth.hook'
+import type { Transaction } from '../../types/transaction.types'
+import { useAuth } from '../../hooks/auth.hook'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createTransaction } from '../lib/api/transaction.api'
-import { TRANSACTIONS } from '../constants/transaction.constants'
-import { closeModal } from '../lib/helpers/dashboard.helpers'
+import { createTransaction } from '../../lib/api/transaction.api'
+import { TRANSACTIONS } from '../../constants/transaction.constants'
+import { closeModal } from '../../lib/helpers/dashboard.helpers'
 
 const TransactionModal = () => {
     const queryClient = useQueryClient()
