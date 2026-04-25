@@ -5,41 +5,53 @@ interface TransactionCardProps extends Transaction {
 }
 
 const TransactionCard = (props: TransactionCardProps) => {
+    const formatDate = (dateString: Date) => {
+        return new Date(dateString).toLocaleDateString()
+    }
+
+    const getTypeText = () => (props.type === 'income' ? 'доходы' : 'расходы')
+    const getTypeColor = () =>
+        props.type === 'income' ? 'text-green-500' : 'text-red-500'
+
     return (
         <>
-            <div className="card w-80 bg-base-100 shadow-lg">
+            <div className="card w-80 bg-base-100 shadow-lg hover:shadow-2xl transition-shadow duration-200">
                 <div className="card-body">
-                    <div className="flex justify-between">
-                        <h2 className="text-2xl font-bold">{props.category}</h2>
-                        <span className="text-2xl">{props.amount}</span>
+                    <div className="text-2xl flex justify-between items-start gap-2">
+                        <h2 className="font-bold">{props.category}</h2>
+                        <span className={`font-semibold ${getTypeColor()}`}>
+                            {props.amount}
+                        </span>
                     </div>
-                    <ul className="mt-6 flex flex-col gap-2 text-xl">
-                        <li>
-                            Тип:{' '}
-                            <span
-                                className={`font-bold ${props.type === 'income' ? 'text-green-500' : 'text-red-500'}`}
-                            >
-                                {props.type === 'income' ? 'доходы' : 'расходы'}
+
+                    <ul className="mt-4 space-y-2 text-base">
+                        <li className="flex justify-between">
+                            <span className="text-gray-600">Тип:</span>
+                            <span className={`font-semibold ${getTypeColor()}`}>
+                                {getTypeText()}
                             </span>
                         </li>
-                        <li>
-                            Дата:{' '}
-                            <span>
-                                {new Date(props.createdAt).toLocaleDateString()}
+                        <li className="flex justify-between">
+                            <span className="text-gray-600">Дата:</span>
+                            <span className="font-medium">
+                                {formatDate(props.createdAt)}
                             </span>
                         </li>
                         {props.comment && (
-                            <li>
-                                <span>{props.comment}</span>
+                            <li className="mt-2 pt-2 border-t border-gray-100">
+                                <p className="mt-1 text-gray-700 wrap-break-word">
+                                    {props.comment}
+                                </p>
                             </li>
                         )}
                     </ul>
-                    <div className="flex gap-4 mt-6">
-                        <button className="btn btn-primary flex-1">
+
+                    <div className="flex gap-3 mt-6">
+                        <button className="btn btn-outline btn-primary flex-1">
                             Редактировать
                         </button>
                         <button
-                            className="btn btn-error flex-1 text-white"
+                            className="btn btn-error flex-1 text-white hover:bg-red-700"
                             onClick={() => {
                                 const modal = document.getElementById(
                                     'delete_modal'
