@@ -21,10 +21,11 @@ const AnalyticsModal = () => {
     const { userId } = useAuth()
     if (!userId) throw new Error('User not authenticated')
 
+    const [isError, setIsError] = useState(false)
     const [formData, setFormData] = useState<FormData>({})
     const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
 
-    const { refetch } = useQuery({
+    const { refetch, isFetching } = useQuery({
         queryKey: ['summary', userId, formData.startDate, formData.endDate],
         queryFn: async () => {
             return await getSummary({
@@ -36,8 +37,31 @@ const AnalyticsModal = () => {
         enabled: false,
     })
 
+    const handleOnChange = (field: keyof FormData, value: string) => {
+        setFormData({
+            ...formData,
+            [field]: value ? new Date(value) : undefined,
+        })
+        setIsError(false)
+    }
+
+    const handleClose = () => {
+        setFormData({})
+        setIsError(false)
+        closeModal('analytics_modal')
+    }
+
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (
+            formData.startDate &&
+            formData.endDate &&
+            formData.startDate > formData.endDate
+        ) {
+            setIsError(true)
+            return
+        }
 
         const result = await refetch()
         if (result.data) {
@@ -49,7 +73,7 @@ const AnalyticsModal = () => {
                 endDate: formData.endDate,
                 groupByCategory: result.data.groupByCategory,
             })
-            closeModal('analytics_modal')
+            handleClose()
             openModal('summary_modal')
         }
     }
@@ -57,7 +81,7 @@ const AnalyticsModal = () => {
     return (
         <>
             <dialog id="analytics_modal" className="modal">
-                <div className="modal-box max-w-92">
+                <div className="modal-box max-w-92 p-4 sm:p-6">
                     <h3 className="font-bold text-lg">Укажите период</h3>
                     <form onSubmit={handleSubmit}>
                         <fieldset className="fieldset p-4">
@@ -74,12 +98,9 @@ const AnalyticsModal = () => {
                                               .split('T')[0]
                                         : ''
                                 }
-                                className="input validator mb-1"
+                                className={`input ${isError ? 'input-error' : ''}`}
                                 onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        startDate: new Date(e.target.value),
-                                    })
+                                    handleOnChange('startDate', e.target.value)
                                 }
                             />
                             {/* дата конца */}
@@ -95,22 +116,34 @@ const AnalyticsModal = () => {
                                               .split('T')[0]
                                         : ''
                                 }
-                                className="input validator mb-3"
+                                className={`input ${isError ? 'input-error' : ''}`}
                                 onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        endDate: new Date(e.target.value),
-                                    })
+                                    handleOnChange('endDate', e.target.value)
                                 }
                             />
-                            <button className="btn btn-primary" type="submit">
-                                Получить аналитику
+                            {isError && (
+                                <span className="text-error">
+                                    Дата конца должна быть больше даты начала
+                                </span>
+                            )}
+                            <button
+                                className="btn btn-primary mt-3"
+                                type="submit"
+                                disabled={isFetching}
+                            >
+                                {isFetching ? (
+                                    <>
+                                        <span className="loading loading-spinner"></span>
+                                    </>
+                                ) : (
+                                    'Получить аналитику'
+                                )}
                             </button>
                         </fieldset>
                     </form>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                    <button>close</button>
+                    <button onClick={handleClose}>close</button>
                 </form>
             </dialog>
 
