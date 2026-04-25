@@ -30,14 +30,17 @@ export const createTransaction = async (
 }
 
 export const updateTransaction = async ({
-    id,
+    transactionId,
     ...transactionData
 }: {
-    id: string
+    transactionId: string
 } & UpdateTransactionDto): Promise<Transaction> => {
+    console.log(transactionId, transactionData)
+    const { id, ...cleanData } = transactionData
+
     const { data } = await api.put<Transaction>(
-        `/transactions/${id}`,
-        transactionData
+        `/transactions/${transactionId}`,
+        cleanData
     )
     return data
 }

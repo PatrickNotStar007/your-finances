@@ -5,6 +5,7 @@ import { TRANSACTIONS } from '../constants/transaction.constants'
 import DeleteModal from '../components/modals/DeleteModal'
 import { useState } from 'react'
 import ControlPanel from '../components/ControlPanel'
+import TransactionFormModal from '../components/modals/TransactionFormModal'
 
 const DashboardPage = () => {
     const [selectedId, setSelectedId] = useState('')

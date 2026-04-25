@@ -1,5 +1,5 @@
 import { FilterIcon, ListCheckIcon, PlusIcon } from 'lucide-react'
-import TransactionModal from './modals/CreateModal'
+import TransactionModal from './modals/TransactionFormModal'
 import AnalyticsModal from './modals/AnalyticsModal'
 import { openModal } from '../lib/helpers/dashboard.helpers'
 
@@ -8,7 +8,7 @@ const ControlPanel = () => {
         <div className="flex justify-between gap-3">
             <button
                 className="btn btn-ghost mr-auto"
-                onClick={() => openModal('create_modal')}
+                onClick={() => openModal('transaction_create_modal')}
             >
                 <PlusIcon className="size-5" />
                 <span className="hidden sm:inline">Добавить транзакцию</span>
@@ -20,7 +20,7 @@ const ControlPanel = () => {
                 <FilterIcon className="size-5" />
                 Фильтрация
             </button>
-            <TransactionModal />
+            <TransactionModal mode="create" />
             <button
                 className="btn btn-ghost"
                 onClick={() => openModal('analytics_modal')}

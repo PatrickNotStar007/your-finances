@@ -1,4 +1,5 @@
 import type { Transaction } from '../types/transaction.types'
+import TransactionFormModal from './modals/TransactionFormModal'
 
 interface TransactionCardProps extends Transaction {
     setSelectedId: (id: string) => void
@@ -12,6 +13,12 @@ const TransactionCard = (props: TransactionCardProps) => {
     const getTypeText = () => (props.type === 'income' ? 'доходы' : 'расходы')
     const getTypeColor = () =>
         props.type === 'income' ? 'text-green-500' : 'text-red-500'
+
+    const onClickHandler = (modalId: string) => {
+        const modal = document.getElementById(modalId) as HTMLDialogElement
+        modal?.showModal()
+        props.setSelectedId(props.id)
+    }
 
     return (
         <>
@@ -47,22 +54,26 @@ const TransactionCard = (props: TransactionCardProps) => {
                     </ul>
 
                     <div className="flex gap-3 mt-6">
-                        <button className="btn btn-outline btn-primary flex-1">
+                        <button
+                            className="btn btn-outline btn-primary flex-1"
+                            onClick={() =>
+                                onClickHandler('transaction_edit_modal')
+                            }
+                        >
                             Редактировать
                         </button>
                         <button
                             className="btn btn-error flex-1 text-white hover:bg-red-700"
-                            onClick={() => {
-                                const modal = document.getElementById(
-                                    'delete_modal'
-                                ) as HTMLDialogElement
-                                modal?.showModal()
-                                props.setSelectedId(props.id)
-                            }}
+                            onClick={() => onClickHandler('delete_modal')}
                         >
                             Удалить
                         </button>
                     </div>
+
+                    <TransactionFormModal
+                        mode="edit"
+                        transactionId={props.id}
+                    />
                 </div>
             </div>
         </>

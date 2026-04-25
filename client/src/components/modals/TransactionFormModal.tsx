@@ -1,18 +1,33 @@
-import { useState } from 'react'
-import type { Transaction } from '../../types/transaction.types'
+import { useEffect, useState } from 'react'
+import type {
+    Transaction,
+    UpdateTransactionDto,
+} from '../../types/transaction.types'
 import { useAuth } from '../../hooks/auth.hook'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createTransaction } from '../../lib/api/transaction.api'
+import {
+    createTransaction,
+    updateTransaction,
+} from '../../lib/api/transaction.api'
 import { TRANSACTIONS } from '../../constants/transaction.constants'
 import { closeModal } from '../../lib/helpers/dashboard.helpers'
 
-const TransactionModal = () => {
+type Mode = 'create' | 'edit'
+
+interface TransactionModalProps {
+    transactionId?: string
+    mode: Mode
+}
+
+const TransactionFormModal = ({
+    transactionId,
+    mode,
+}: TransactionModalProps) => {
     const queryClient = useQueryClient()
     const { userId } = useAuth()
+    if (!userId) throw new Error('Пользователь не авторизован')
 
-    const [openToast, setOpenToast] = useState(false)
-
-    const [formData, setFormData] = useState<Transaction>({
+    const initialFormData: Transaction = {
         id: '',
         amount: 0,
         type: 'income',
@@ -20,29 +35,73 @@ const TransactionModal = () => {
         createdAt: new Date(),
         userId: userId || '',
         comment: '',
-    })
+    }
+
+    const [showToast, setShowToast] = useState(false)
+    const [toastMessage, setToastMessage] = useState('')
+
+    const [formData, setFormData] = useState<Transaction>(initialFormData)
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
-        createTransactionMutation.mutate(formData)
+
+        switch (mode) {
+            case 'create':
+                createMutation.mutate(formData)
+                break
+            case 'edit':
+                updateMutation.mutate(formData)
+                break
+            default:
+                break
+        }
     }
 
-    const createTransactionMutation = useMutation({
-        mutationFn: async (formData: Transaction) =>
-            await createTransaction(formData),
+    useEffect(() => {
+        if (showToast) {
+            const timer = setTimeout(() => setShowToast(false), 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [showToast])
+
+    const createMutation = useMutation({
+        mutationFn: async (formData: Transaction) => {
+            await createTransaction(formData)
+        },
         onSuccess: () => {
-            closeModal('create_modal')
-            setOpenToast(true)
-            setTimeout(() => setOpenToast(false), 3000)
-            queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
+            setToastMessage('Транзакция успешно создана :)')
+            hadnleSuccess()
         },
     })
 
+    const updateMutation = useMutation({
+        mutationFn: async (formData: UpdateTransactionDto) => {
+            if (transactionId) {
+                await updateTransaction({ transactionId, ...formData })
+            }
+        },
+        onSuccess: () => {
+            setToastMessage('Транзакция успешно исправлена :)')
+            hadnleSuccess()
+        },
+    })
+
+    const hadnleSuccess = () => {
+        closeModal('transaction_modal')
+        setShowToast(true)
+        setFormData(initialFormData)
+        queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
+    }
+
+    const modalTitle =
+        mode === 'create' ? 'Новая транзакция' : 'Редактировать транзакцию'
+    const buttonText = mode === 'create' ? 'Создать' : 'Сохранить'
+
     return (
-        <>
-            <dialog id="create_modal" className="modal">
+        <div>
+            <dialog id={`transaction_${mode}_modal`} className="modal">
                 <div className="modal-box">
-                    <h3 className="font-bold text-lg">Новая транзакция</h3>
+                    <h3 className="font-bold text-lg">{modalTitle}</h3>
                     <form onSubmit={handleSubmit}>
                         <fieldset className="fieldset p-4">
                             {/* сумма */}
@@ -161,7 +220,7 @@ const TransactionModal = () => {
                                 </p>
                             </div>
                             <button className="btn" type="submit">
-                                Создать
+                                {buttonText}
                             </button>
                         </fieldset>
                     </form>
@@ -171,15 +230,17 @@ const TransactionModal = () => {
                 </form>
             </dialog>
 
-            {openToast && (
-                <div id="success_toast" className="toast">
-                    <div className="alert alert-success">
-                        <span>Транзакция успешно создана :)</span>
+            {showToast && (
+                <div className="toast">
+                    <div
+                        className={`alert ${toastMessage.includes('успешно') ? 'alert-success' : 'alert-error'} `}
+                    >
+                        <span>{toastMessage}</span>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }
 
-export default TransactionModal
+export default TransactionFormModal
