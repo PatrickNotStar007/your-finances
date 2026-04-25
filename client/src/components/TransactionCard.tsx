@@ -73,6 +73,7 @@ const TransactionCard = (props: TransactionCardProps) => {
                     <TransactionFormModal
                         mode="edit"
                         transactionId={props.id}
+                        editData={props}
                     />
                 </div>
             </div>

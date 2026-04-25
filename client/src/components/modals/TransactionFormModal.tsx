@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type {
-    Transaction,
+    CreateTransactionDto,
     UpdateTransactionDto,
 } from '../../types/transaction.types'
 import { useAuth } from '../../hooks/auth.hook'
@@ -15,43 +15,77 @@ import { closeModal } from '../../lib/helpers/dashboard.helpers'
 type Mode = 'create' | 'edit'
 
 interface TransactionModalProps {
-    transactionId?: string
     mode: Mode
+    transactionId?: string
+    editData?: UpdateTransactionDto
+}
+
+interface FormDataType {
+    amount: number
+    type: 'income' | 'expense'
+    category: string
+    createdAt: Date
+    comment?: string
 }
 
 const TransactionFormModal = ({
     transactionId,
     mode,
+    editData,
 }: TransactionModalProps) => {
     const queryClient = useQueryClient()
     const { userId } = useAuth()
     if (!userId) throw new Error('Пользователь не авторизован')
 
-    const initialFormData: Transaction = {
-        id: '',
-        amount: 0,
-        type: 'income',
-        category: '',
-        createdAt: new Date(),
-        userId: userId || '',
-        comment: '',
+    const getInitialData = (): FormDataType => {
+        if (mode === 'edit' && editData)
+            return {
+                amount: editData.amount ?? 0,
+                type: editData.type ?? 'income',
+                category: editData.category ?? '',
+                createdAt: editData.createdAt ?? new Date(),
+                comment: editData.comment,
+            }
+        else {
+            return {
+                amount: 0,
+                type: 'income',
+                category: '',
+                createdAt: new Date(),
+                comment: '',
+            }
+        }
     }
 
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
+    const [formData, setFormData] = useState<FormDataType>(getInitialData())
 
-    const [formData, setFormData] = useState<Transaction>(initialFormData)
-
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-
+        const commonData = {
+            amount: formData.amount,
+            type: formData.type,
+            category: formData.category,
+            createdAt: formData.createdAt,
+            comment: formData.comment,
+        }
         switch (mode) {
-            case 'create':
-                createMutation.mutate(formData)
+            case 'create': {
+                createMutation.mutate({ userId, ...commonData })
                 break
-            case 'edit':
-                updateMutation.mutate(formData)
+            }
+            case 'edit': {
+                const updateData: UpdateTransactionDto = {
+                    amount: formData.amount,
+                    type: formData.type,
+                    category: formData.category,
+                    createdAt: formData.createdAt,
+                    comment: formData.comment,
+                }
+                updateMutation.mutate(updateData)
                 break
+            }
             default:
                 break
         }
@@ -65,7 +99,7 @@ const TransactionFormModal = ({
     }, [showToast])
 
     const createMutation = useMutation({
-        mutationFn: async (formData: Transaction) => {
+        mutationFn: async (formData: CreateTransactionDto) => {
             await createTransaction(formData)
         },
         onSuccess: () => {
@@ -87,9 +121,10 @@ const TransactionFormModal = ({
     })
 
     const hadnleSuccess = () => {
-        closeModal('transaction_modal')
+        closeModal(`transaction_${mode}_modal`)
         setShowToast(true)
-        setFormData(initialFormData)
+        const timer = setTimeout(() => setFormData(getInitialData()), 300)
+        clearTimeout(timer)
         queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
     }
 
