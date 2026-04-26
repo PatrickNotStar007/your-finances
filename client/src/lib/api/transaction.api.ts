@@ -1,4 +1,5 @@
 import type {
+    CreateTransactionDto,
     Transaction,
     TransactionsFilter,
     UpdateTransactionDto,
@@ -20,7 +21,7 @@ export const getTransactionById = async (id: string): Promise<Transaction> => {
 }
 
 export const createTransaction = async (
-    transactionData: Transaction
+    transactionData: CreateTransactionDto
 ): Promise<Transaction> => {
     const { data } = await api.post<Transaction>(
         '/transactions',
@@ -30,13 +31,13 @@ export const createTransaction = async (
 }
 
 export const updateTransaction = async ({
-    id,
+    transactionId,
     ...transactionData
 }: {
-    id: string
+    transactionId: string
 } & UpdateTransactionDto): Promise<Transaction> => {
     const { data } = await api.put<Transaction>(
-        `/transactions/${id}`,
+        `/transactions/${transactionId}`,
         transactionData
     )
     return data

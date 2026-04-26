@@ -20,4 +20,9 @@ export interface TransactionsFilter {
     }
 }
 
-export interface UpdateTransactionDto extends Partial<Transaction> {}
+export interface CreateTransactionDto extends Omit<Transaction, 'id'> {}
+
+export interface UpdateTransactionDto extends Omit<
+    Partial<Transaction>,
+    'userId' | 'id'
+> {}

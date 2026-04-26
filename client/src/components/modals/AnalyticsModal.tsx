@@ -19,7 +19,7 @@ interface SummaryData extends FormData {
 
 const AnalyticsModal = () => {
     const { userId } = useAuth()
-    if (!userId) throw new Error('User not authenticated')
+    if (!userId) throw new Error('Пользователь не авторизован')
 
     const [isError, setIsError] = useState(false)
     const [formData, setFormData] = useState<FormData>({})
