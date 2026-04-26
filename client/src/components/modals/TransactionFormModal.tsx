@@ -11,6 +11,7 @@ import {
 } from '../../lib/api/transaction.api'
 import { TRANSACTIONS } from '../../constants/transaction.constants'
 import { closeModal } from '../../lib/helpers/dashboard.helpers'
+import { toDate } from '../../lib/helpers/transaction.helpers'
 
 type Mode = 'create' | 'edit'
 
@@ -43,7 +44,7 @@ const TransactionFormModal = ({
                 amount: editData.amount ?? 0,
                 type: editData.type ?? 'income',
                 category: editData.category ?? '',
-                createdAt: editData.createdAt ?? new Date(),
+                createdAt: toDate(editData.createdAt),
                 comment: editData.comment,
             }
         else {
@@ -61,6 +62,8 @@ const TransactionFormModal = ({
     const [toastMessage, setToastMessage] = useState('')
     const [formData, setFormData] = useState<FormDataType>(getInitialData())
 
+    useEffect(() => setFormData(getInitialData()), [editData])
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const commonData = {
@@ -76,14 +79,7 @@ const TransactionFormModal = ({
                 break
             }
             case 'edit': {
-                const updateData: UpdateTransactionDto = {
-                    amount: formData.amount,
-                    type: formData.type,
-                    category: formData.category,
-                    createdAt: formData.createdAt,
-                    comment: formData.comment,
-                }
-                updateMutation.mutate(updateData)
+                updateMutation.mutate(commonData)
                 break
             }
             default:
@@ -103,8 +99,9 @@ const TransactionFormModal = ({
             await createTransaction(formData)
         },
         onSuccess: () => {
+            setFormData(getInitialData())
             setToastMessage('Транзакция успешно создана :)')
-            hadnleSuccess()
+            handleSuccess()
         },
     })
 
@@ -116,12 +113,12 @@ const TransactionFormModal = ({
         },
         onSuccess: () => {
             setToastMessage('Транзакция успешно исправлена :)')
-            hadnleSuccess()
+            handleSuccess()
         },
     })
 
-    const hadnleSuccess = () => {
-        closeModal(`transaction_${mode}_modal`)
+    const handleSuccess = () => {
+        closeModal(`${mode}_modal`)
         setShowToast(true)
         const timer = setTimeout(() => setFormData(getInitialData()), 300)
         clearTimeout(timer)
@@ -134,59 +131,80 @@ const TransactionFormModal = ({
 
     return (
         <div>
-            <dialog id={`transaction_${mode}_modal`} className="modal">
-                <div className="modal-box">
-                    <h3 className="font-bold text-lg">{modalTitle}</h3>
+            <dialog id={`${mode}_modal`} className="modal">
+                <div className="modal-box max-w-120 p-10">
+                    <h3 className="font-bold text-xl mb-10">{modalTitle}</h3>
+
                     <form onSubmit={handleSubmit}>
-                        <fieldset className="fieldset p-4">
+                        <div className="space-y-5">
                             {/* сумма */}
-                            <label className="label">Сумма</label>
                             <div>
-                                <input
-                                    type="number"
-                                    className="input validator"
-                                    value={formData.amount}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            amount: parseFloat(e.target.value),
-                                        })
-                                    }}
-                                    required
-                                    placeholder="100"
-                                    min="1"
-                                    max="999999999"
-                                    title="Must be between be 1 to 10"
-                                />
-                                <p className="validator-hint">
-                                    Введите число от 1 до 999999999
+                                <label className="block text-sm font-semibold  mb-2">
+                                    Сумма
+                                </label>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="input w-full pl-4 focus:input-primary transition-all"
+                                        value={formData.amount || ''}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                amount: parseFloat(
+                                                    e.target.value
+                                                ),
+                                            })
+                                        }}
+                                        required
+                                        placeholder="0"
+                                        min="1"
+                                        max="999999999"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    От 1 до 999 999 999 ₽
                                 </p>
                             </div>
 
                             {/* тип */}
-                            <label className="label">Тип</label>
                             <div>
-                                <select
-                                    value={formData.type}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            type: e.target.value as
-                                                | 'income'
-                                                | 'expense',
-                                        })
-                                    }}
-                                    className="select"
-                                >
-                                    <option value="income">Доходы</option>
-                                    <option value="expense">Расходы</option>
-                                </select>
+                                <label className="block text-sm font-semibold mb-2">
+                                    Тип
+                                </label>
+                                <div className="flex gap-3">
+                                    <button
+                                        type="button"
+                                        className={`flex-1 btn btn-success ${formData.type === 'income' ? 'text-white' : 'btn-outline'}`}
+                                        onClick={() => {
+                                            setFormData({
+                                                ...formData,
+                                                type: 'income',
+                                            })
+                                        }}
+                                    >
+                                        Доход
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`flex-1 btn btn-error ${formData.type === 'expense' ? 'text-white' : 'btn-outline'}`}
+                                        onClick={() => {
+                                            setFormData({
+                                                ...formData,
+                                                type: 'expense',
+                                            })
+                                        }}
+                                    >
+                                        Расход
+                                    </button>
+                                </div>
                             </div>
-                            <label className="label">Категория</label>
                             <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    Категория
+                                </label>
                                 <input
                                     type="text"
-                                    className="input validator"
+                                    className="input w-full focus:input-primary transition-all"
                                     value={formData.category}
                                     onChange={(e) =>
                                         setFormData({
@@ -195,46 +213,49 @@ const TransactionFormModal = ({
                                         })
                                     }
                                     required
-                                    placeholder="транспорт"
+                                    placeholder="Например: Транспорт, Зарплата..."
                                     pattern="[A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9\-]*"
                                     minLength={3}
                                     maxLength={30}
-                                    title="только буквы, числа, тире"
                                 />
-                                <p className="validator-hint">
-                                    Введите от 3 до 30 символов
-                                    <br />
-                                    (только буквы, числа, тире)
+                                <p className="text-xs text-gray-400 mt-1">
+                                    3-30 символов (буквы, числа, дефис)
                                 </p>
                             </div>
 
                             {/* дата */}
-                            <label className="label">Дата</label>
-                            <input
-                                type="date"
-                                className="input validator"
-                                value={
-                                    formData.createdAt
-                                        .toISOString()
-                                        .split('T')[0]
-                                }
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        createdAt: new Date(e.target.value),
-                                    })
-                                }
-                                required
-                            />
-
-                            {/* описание */}
-                            <label className="label">
-                                Описание (необязательно)
-                            </label>
                             <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    Дата
+                                </label>
                                 <input
-                                    type="text"
-                                    className="input validator"
+                                    type="date"
+                                    className="input w-full focus:input-primary transition-all"
+                                    value={
+                                        formData.createdAt
+                                            .toISOString()
+                                            .split('T')[0]
+                                    }
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            createdAt: new Date(e.target.value),
+                                        })
+                                    }
+                                    required
+                                />
+                            </div>
+
+                            {/* комментарий */}
+                            <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    Описание
+                                    <span className="text-xs font-normal text-gray-400 ml-2">
+                                        (необязательно)
+                                    </span>
+                                </label>
+                                <textarea
+                                    className="textarea w-full focus:textarea-primary transition-all resize-none"
                                     value={formData.comment}
                                     onChange={(e) =>
                                         setFormData({
@@ -242,35 +263,56 @@ const TransactionFormModal = ({
                                             comment: e.target.value,
                                         })
                                     }
-                                    // placeholder="транспорт"
-                                    pattern="[A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9\-]*"
-                                    // minLength={3}
-                                    // maxLength={30}
-                                    title="Only letters, numbers or dash"
+                                    rows={4}
+                                    maxLength={200}
+                                    placeholder="Дополнительная информация..."
                                 />
-                                <p className="validator-hint">
-                                    Введите от 3 до 30 символов
-                                    <br />
-                                    (только буквы, числа, тире)
+                                <p className="text-xs text-gray-400 mt-1 text-right">
+                                    {formData.comment?.length || 0}/200
                                 </p>
                             </div>
-                            <button className="btn" type="submit">
-                                {buttonText}
-                            </button>
-                        </fieldset>
+
+                            {/* кнопки */}
+                            <div className="flex gap-3">
+                                <button
+                                    className="btn btn-outline flex-1"
+                                    type="button"
+                                    onClick={() => closeModal(`${mode}_modal`)}
+                                >
+                                    Отмена
+                                </button>
+                                <button
+                                    className="btn btn-primary flex-1"
+                                    type="submit"
+                                    disabled={
+                                        createMutation.isPending ||
+                                        updateMutation.isPending
+                                    }
+                                >
+                                    {createMutation.isPending ||
+                                    updateMutation.isPending ? (
+                                        <span className="loading"></span>
+                                    ) : (
+                                        <span>{buttonText}</span>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
+
                 <form method="dialog" className="modal-backdrop">
                     <button>close</button>
                 </form>
             </dialog>
 
+            {/* тост */}
             {showToast && (
                 <div className="toast">
                     <div
                         className={`alert ${toastMessage.includes('успешно') ? 'alert-success' : 'alert-error'} `}
                     >
-                        <span>{toastMessage}</span>
+                        <span className="text-white">{toastMessage}</span>
                     </div>
                 </div>
             )}

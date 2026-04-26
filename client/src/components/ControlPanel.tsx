@@ -8,7 +8,7 @@ const ControlPanel = () => {
         <div className="flex justify-between gap-3">
             <button
                 className="btn btn-ghost mr-auto"
-                onClick={() => openModal('transaction_create_modal')}
+                onClick={() => openModal('create_modal')}
             >
                 <PlusIcon className="size-5" />
                 <span className="hidden sm:inline">Добавить транзакцию</span>

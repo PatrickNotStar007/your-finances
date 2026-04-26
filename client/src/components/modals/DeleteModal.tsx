@@ -5,22 +5,25 @@ import { deleteTransaction } from '../../lib/api/transaction.api'
 import { closeModal } from '../../lib/helpers/dashboard.helpers'
 
 interface DeleteProps {
-    id: string
+    transactionId: string
 }
 
-const DeleteModal = ({ id }: DeleteProps) => {
+const DeleteModal = ({ transactionId }: DeleteProps) => {
     const queryClient = useQueryClient()
     const [openToast, setOpenToast] = useState(false)
 
     const deleteMutation = useMutation({
         mutationFn: async () => {
-            await deleteTransaction(id)
+            await deleteTransaction(transactionId)
         },
         onSuccess: () => {
             closeModal('delete_modal')
             setOpenToast(true)
-            setTimeout(() => setOpenToast(false), 3000)
-            queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
+            const timer = setTimeout(() => setOpenToast(false), 3000)
+            clearTimeout(timer)
+            queryClient.invalidateQueries({
+                queryKey: [TRANSACTIONS],
+            })
         },
         onError: (e) => {
             console.log(e)
