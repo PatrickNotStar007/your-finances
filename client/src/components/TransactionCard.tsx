@@ -16,7 +16,7 @@ const TransactionCard = (props: TransactionCardProps) => {
 
     return (
         <>
-            <div className="card w-80 bg-base-100 shadow-lg hover:shadow-2xl transition-shadow duration-200">
+            <div className="card w-80 bg-base-100 shadow-lg hover:shadow-2xl transition-shadow duration-200 self-start">
                 <div className="card-body">
                     <div className="text-2xl flex justify-between items-start gap-2">
                         <h2 className="font-bold">{props.category}</h2>

@@ -34,7 +34,7 @@ const DashboardPage = () => {
                 <div className="mb-4">
                     <ControlPanel />
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {data?.map((transaction) => (
                         <TransactionCard
                             key={transaction.id}
@@ -44,6 +44,14 @@ const DashboardPage = () => {
                         />
                     ))}
                 </div>
+
+                {data?.length === 0 && (
+                    <div className="text-center py-12">
+                        <p className="text-gray-500 text-xl">
+                            У тебя пока нет транзакций :(
+                        </p>
+                    </div>
+                )}
 
                 <TransactionFormModal
                     mode="edit"

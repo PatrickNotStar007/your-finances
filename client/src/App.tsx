@@ -9,7 +9,7 @@ function App() {
     return (
         <div className="min-h-screen bg-base-100">
             <Navbar />
-            <main className="max-w-5xl m-auto px-4 py-8">
+            <main className="max-w-5xl mx-auto px-4 py-8">
                 <Routes>
                     <Route
                         path="/dashboard"
