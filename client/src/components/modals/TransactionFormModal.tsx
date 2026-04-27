@@ -10,8 +10,8 @@ import {
     updateTransaction,
 } from '../../lib/api/transaction.api'
 import { TRANSACTIONS } from '../../constants/transaction.constants'
-import { closeModal } from '../../lib/helpers/dashboard.helpers'
 import { toDate } from '../../lib/helpers/transaction.helpers'
+import { closeModal, formatDateForInput } from '../../lib/helpers/moda.helpers'
 
 type Mode = 'create' | 'edit'
 
@@ -232,9 +232,10 @@ const TransactionFormModal = ({
                                     type="date"
                                     className="input w-full focus:input-primary transition-all"
                                     value={
-                                        formData.createdAt
-                                            .toISOString()
-                                            .split('T')[0]
+                                        formatDateForInput(formData.createdAt)
+                                        // formData.createdAt
+                                        //     .toISOString()
+                                        //     .split('T')[0]
                                     }
                                     onChange={(e) =>
                                         setFormData({
@@ -302,7 +303,18 @@ const TransactionFormModal = ({
                 </div>
 
                 <form method="dialog" className="modal-backdrop">
-                    <button>close</button>
+                    <button
+                        onClick={() => {
+                            const timer = setTimeout(
+                                () => setFormData(getInitialData()),
+                                200
+                            )
+
+                            return () => clearTimeout(timer)
+                        }}
+                    >
+                        close
+                    </button>
                 </form>
             </dialog>
 

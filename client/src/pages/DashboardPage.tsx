@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { getTransactions } from '../lib/api/transaction.api'
 import TransactionCard from '../components/TransactionCard'
 import { TRANSACTIONS } from '../constants/transaction.constants'
@@ -8,17 +8,26 @@ import ControlPanel from '../components/ControlPanel'
 import TransactionFormModal from '../components/modals/TransactionFormModal'
 import type {
     Transaction,
+    TransactionsFilter,
     UpdateTransactionDto,
 } from '../types/transaction.types'
 import { openModal } from '../lib/helpers/dashboard.helpers'
+import { useAuth } from '../hooks/auth.hook'
 
 const DashboardPage = () => {
+    const { userId } = useAuth()
+    if (!userId) throw Error
+
     const [selectedTransaction, setSelectedTransaction] =
         useState<Transaction | null>(null)
     const [selectedId, setSelectedId] = useState('')
+
+    const [filters, setFilters] = useState<TransactionsFilter>({ userId })
+
     const { data, isLoading } = useQuery({
-        queryKey: [TRANSACTIONS],
-        queryFn: async () => await getTransactions(),
+        queryKey: [TRANSACTIONS, filters],
+        queryFn: async () => await getTransactions({ ...filters }),
+        placeholderData: keepPreviousData,
     })
 
     const handleEdit = (transaction: Transaction) => {
@@ -32,9 +41,9 @@ const DashboardPage = () => {
         return (
             <>
                 <div className="mb-4">
-                    <ControlPanel />
+                    <ControlPanel setFilters={setFilters} />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center">
                     {data?.map((transaction) => (
                         <TransactionCard
                             key={transaction.id}
