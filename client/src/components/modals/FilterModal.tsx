@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { closeModal } from '../../lib/helpers/dashboard.helpers'
+import { closeModal, formatDateForInput } from '../../lib/helpers/moda.helpers'
 
 interface FormDataType {
     type?: 'income' | 'expense'
@@ -25,13 +25,25 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
         closeModal('filter_modal')
     }
 
+    const handleTypeClick = (type: 'income' | 'expense') => {
+        setFormData((prev) => ({
+            ...prev,
+            type: prev.type === type ? undefined : type,
+        }))
+    }
+
     const resetForm = () => {
-        setFormData({
-            type: undefined,
-            category: '',
-            startDate: null,
-            endDate: null,
-        })
+        const timer = setTimeout(
+            () =>
+                setFormData({
+                    type: undefined,
+                    category: '',
+                    startDate: null,
+                    endDate: null,
+                }),
+            300
+        )
+        return () => clearTimeout(timer)
     }
 
     return (
@@ -50,24 +62,14 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                                 <button
                                     type="button"
                                     className={`flex-1 btn btn-success ${formData.type === 'income' ? 'text-white' : 'btn-outline'}`}
-                                    onClick={() => {
-                                        setFormData({
-                                            ...formData,
-                                            type: 'income',
-                                        })
-                                    }}
+                                    onClick={() => handleTypeClick('income')}
                                 >
                                     Доход
                                 </button>
                                 <button
                                     type="button"
                                     className={`flex-1 btn btn-error ${formData.type === 'expense' ? 'text-white' : 'btn-outline'}`}
-                                    onClick={() => {
-                                        setFormData({
-                                            ...formData,
-                                            type: 'expense',
-                                        })
-                                    }}
+                                    onClick={() => handleTypeClick('expense')}
                                 >
                                     Расход
                                 </button>
@@ -104,11 +106,7 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                             <input
                                 type="date"
                                 className="input w-full focus:input-primary transition-all"
-                                value={
-                                    formData.startDate
-                                        ?.toISOString()
-                                        .split('T')[0]
-                                }
+                                value={formatDateForInput(formData.startDate)}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
@@ -126,11 +124,7 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                             <input
                                 type="date"
                                 className="input w-full focus:input-primary transition-all"
-                                value={
-                                    formData.endDate
-                                        ?.toISOString()
-                                        .split('T')[0]
-                                }
+                                value={formatDateForInput(formData.endDate)}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
@@ -147,7 +141,7 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                                 type="button"
                                 onClick={() => {
                                     closeModal('filter_modal')
-                                    setFormData({})
+                                    resetForm()
                                 }}
                             >
                                 Отмена
@@ -163,7 +157,11 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                 </form>
             </div>
 
-            <form method="dialog" className="modal-backdrop">
+            <form
+                method="dialog"
+                className="modal-backdrop"
+                onClick={() => resetForm()}
+            >
                 <button>close</button>
             </form>
         </dialog>
