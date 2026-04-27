@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { closeModal, formatDateForInput } from '../../lib/helpers/moda.helpers'
+import { closeModal, formatDateForInput } from '../../lib/helpers/modal.helpers'
 
 interface FormDataType {
     type?: 'income' | 'expense'

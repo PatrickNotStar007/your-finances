@@ -11,7 +11,7 @@ import {
 } from '../../lib/api/transaction.api'
 import { TRANSACTIONS } from '../../constants/transaction.constants'
 import { toDate } from '../../lib/helpers/transaction.helpers'
-import { closeModal, formatDateForInput } from '../../lib/helpers/moda.helpers'
+import { closeModal, formatDateForInput } from '../../lib/helpers/modal.helpers'
 
 type Mode = 'create' | 'edit'
 

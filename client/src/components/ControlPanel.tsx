@@ -1,8 +1,8 @@
 import { FilterIcon, FilterXIcon, ListCheckIcon, PlusIcon } from 'lucide-react'
 import TransactionModal from './modals/TransactionFormModal'
 import AnalyticsModal from './modals/AnalyticsModal'
-import { openModal } from '../lib/helpers/dashboard.helpers'
 import FilterModal from './modals/FilterModal'
+import { openModal } from '../lib/helpers/modal.helpers'
 
 interface ControlPanelProps {
     setFilters: (filters: any) => void

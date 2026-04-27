@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getSummary } from '../../lib/api/summary.api'
 import { useAuth } from '../../hooks/auth.hook'
-import { closeModal, openModal } from '../../lib/helpers/dashboard.helpers'
 import SummaryModal from './SummaryModal'
+import { closeModal, openModal } from '../../lib/helpers/modal.helpers'
 
 interface FormData {
     startDate?: Date

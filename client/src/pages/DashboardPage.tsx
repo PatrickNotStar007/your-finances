@@ -11,8 +11,8 @@ import type {
     TransactionsFilter,
     UpdateTransactionDto,
 } from '../types/transaction.types'
-import { openModal } from '../lib/helpers/dashboard.helpers'
 import { useAuth } from '../hooks/auth.hook'
+import { openModal } from '../lib/helpers/modal.helpers'
 
 const DashboardPage = () => {
     const { userId } = useAuth()

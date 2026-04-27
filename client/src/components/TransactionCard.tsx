@@ -1,5 +1,6 @@
-import { openModal } from '../lib/helpers/dashboard.helpers'
+import { openModal } from '../lib/helpers/modal.helpers'
 import type { Transaction } from '../types/transaction.types'
+
 interface TransactionCardProps extends Transaction {
     setSelectedId: (id: string) => void
     onEdit: () => void

@@ -1,4 +1,5 @@
-import { closeModal, formatDate } from '../../lib/helpers/dashboard.helpers'
+import { formatDate } from '../../lib/helpers/dashboard.helpers'
+import { closeModal } from '../../lib/helpers/modal.helpers'
 
 interface SummaryProps {
     setFormData: React.Dispatch<
