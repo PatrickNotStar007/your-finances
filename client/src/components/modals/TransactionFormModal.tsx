@@ -12,6 +12,8 @@ import {
 import { TRANSACTIONS } from '../../constants/transaction.constants'
 import { toDate } from '../../lib/helpers/transaction.helpers'
 import { closeModal, formatDateForInput } from '../../lib/helpers/modal.helpers'
+import useToast from '../../hooks/UseToast'
+import Toast from '../Toast'
 
 type Mode = 'create' | 'edit'
 
@@ -58,8 +60,6 @@ const TransactionFormModal = ({
         }
     }
 
-    const [showToast, setShowToast] = useState(false)
-    const [toastMessage, setToastMessage] = useState('')
     const [formData, setFormData] = useState<FormDataType>(getInitialData())
 
     useEffect(() => setFormData(getInitialData()), [editData])
@@ -87,12 +87,7 @@ const TransactionFormModal = ({
         }
     }
 
-    useEffect(() => {
-        if (showToast) {
-            const timer = setTimeout(() => setShowToast(false), 3000)
-            return () => clearTimeout(timer)
-        }
-    }, [showToast])
+    const { isVisible, showToast, message } = useToast()
 
     const createMutation = useMutation({
         mutationFn: async (formData: CreateTransactionDto) => {
@@ -100,7 +95,7 @@ const TransactionFormModal = ({
         },
         onSuccess: () => {
             setFormData(getInitialData())
-            setToastMessage('Транзакция успешно создана :)')
+            showToast('Транзакция успешно создана :)', 'success')
             handleSuccess()
         },
     })
@@ -112,14 +107,13 @@ const TransactionFormModal = ({
             }
         },
         onSuccess: () => {
-            setToastMessage('Транзакция успешно исправлена :)')
+            showToast('Транзакция успешно исправлена :)', 'success')
             handleSuccess()
         },
     })
 
     const handleSuccess = () => {
         closeModal(`${mode}_modal`)
-        setShowToast(true)
         const timer = setTimeout(() => setFormData(getInitialData()), 300)
         clearTimeout(timer)
         queryClient.invalidateQueries({ queryKey: [TRANSACTIONS] })
@@ -231,12 +225,9 @@ const TransactionFormModal = ({
                                 <input
                                     type="date"
                                     className="input w-full focus:input-primary transition-all"
-                                    value={
-                                        formatDateForInput(formData.createdAt)
-                                        // formData.createdAt
-                                        //     .toISOString()
-                                        //     .split('T')[0]
-                                    }
+                                    value={formatDateForInput(
+                                        formData.createdAt
+                                    )}
                                     onChange={(e) =>
                                         setFormData({
                                             ...formData,
@@ -319,15 +310,7 @@ const TransactionFormModal = ({
             </dialog>
 
             {/* тост */}
-            {showToast && (
-                <div className="toast">
-                    <div
-                        className={`alert ${toastMessage.includes('успешно') ? 'alert-success' : 'alert-error'} `}
-                    >
-                        <span className="text-white">{toastMessage}</span>
-                    </div>
-                </div>
-            )}
+            {isVisible && <Toast message={message} />}
         </div>
     )
 }

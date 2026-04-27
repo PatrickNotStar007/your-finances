@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRANSACTIONS } from '../../constants/transaction.constants'
-import { useEffect, useState } from 'react'
 import { deleteTransaction } from '../../lib/api/transaction.api'
 import { closeModal } from '../../lib/helpers/modal.helpers'
+import useToast from '../../hooks/UseToast'
+import Toast from '../Toast'
 
 interface DeleteProps {
     transactionId: string
@@ -10,7 +11,7 @@ interface DeleteProps {
 
 const DeleteModal = ({ transactionId }: DeleteProps) => {
     const queryClient = useQueryClient()
-    const [openToast, setOpenToast] = useState(false)
+    const { isVisible, showToast, message } = useToast()
 
     const deleteMutation = useMutation({
         mutationFn: async () => {
@@ -18,7 +19,7 @@ const DeleteModal = ({ transactionId }: DeleteProps) => {
         },
         onSuccess: () => {
             closeModal('delete_modal')
-            setOpenToast(true)
+            showToast('Транзакция успешно удалена :(', 'success')
 
             queryClient.invalidateQueries({
                 queryKey: [TRANSACTIONS],
@@ -28,13 +29,6 @@ const DeleteModal = ({ transactionId }: DeleteProps) => {
             console.log(e)
         },
     })
-
-    useEffect(() => {
-        if (openToast) {
-            const timer = setTimeout(() => setOpenToast(false), 3000)
-            return () => clearTimeout(timer)
-        }
-    }, [openToast])
 
     return (
         <>
@@ -65,13 +59,8 @@ const DeleteModal = ({ transactionId }: DeleteProps) => {
                     </div>
                 </div>
             </dialog>
-            {openToast && (
-                <div id="success_toast" className="toast">
-                    <div className="alert alert-success">
-                        <span>Транзакция успешно удалена :(</span>
-                    </div>
-                </div>
-            )}
+
+            {isVisible && <Toast message={message} />}
         </>
     )
 }
