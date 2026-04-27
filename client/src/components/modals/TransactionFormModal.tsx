@@ -87,7 +87,7 @@ const TransactionFormModal = ({
         }
     }
 
-    const { isVisible, showToast, message } = useToast()
+    const { isVisible, showToast, toastMessage, toastType } = useToast()
 
     const createMutation = useMutation({
         mutationFn: async (formData: CreateTransactionDto) => {
@@ -310,7 +310,7 @@ const TransactionFormModal = ({
             </dialog>
 
             {/* тост */}
-            {isVisible && <Toast message={message} />}
+            {isVisible && <Toast message={toastMessage} type={toastType} />}
         </div>
     )
 }

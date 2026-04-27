@@ -28,20 +28,20 @@ const TransactionCard = (props: TransactionCardProps) => {
 
                     <ul className="mt-4 space-y-2 text-base">
                         <li className="flex justify-between">
-                            <span className="text-gray-600">Тип:</span>
+                            <span>Тип:</span>
                             <span className={`font-semibold ${getTypeColor()}`}>
                                 {getTypeText()}
                             </span>
                         </li>
                         <li className="flex justify-between">
-                            <span className="text-gray-600">Дата:</span>
+                            <span>Дата:</span>
                             <span className="font-medium">
                                 {formatDate(props.createdAt)}
                             </span>
                         </li>
                         {props.comment && (
-                            <li className="mt-2 pt-2 border-t border-gray-100">
-                                <p className="mt-1 text-gray-700 wrap-break-word">
+                            <li className="mt-2 pt-2 border-t border-gray-400">
+                                <p className="mt-1 wrap-break-word">
                                     {props.comment}
                                 </p>
                             </li>
@@ -57,7 +57,6 @@ const TransactionCard = (props: TransactionCardProps) => {
                         </button>
                         <button
                             className="btn btn-error flex-1 text-white hover:bg-red-700"
-                            // onClick={() => onClickHandler()}
                             onClick={() => {
                                 props.setSelectedId(props.id)
                                 openModal('delete_modal')

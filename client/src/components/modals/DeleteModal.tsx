@@ -11,7 +11,7 @@ interface DeleteProps {
 
 const DeleteModal = ({ transactionId }: DeleteProps) => {
     const queryClient = useQueryClient()
-    const { isVisible, showToast, message } = useToast()
+    const { isVisible, showToast, toastMessage, toastType } = useToast()
 
     const deleteMutation = useMutation({
         mutationFn: async () => {
@@ -60,7 +60,7 @@ const DeleteModal = ({ transactionId }: DeleteProps) => {
                 </div>
             </dialog>
 
-            {isVisible && <Toast message={message} />}
+            {isVisible && <Toast message={toastMessage} type={toastType} />}
         </>
     )
 }

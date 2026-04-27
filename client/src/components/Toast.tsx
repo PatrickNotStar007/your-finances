@@ -1,5 +1,8 @@
+import type { ToastType } from '../types/toast.types'
+
 interface ToastProps {
     message: string
+    type: ToastType
 }
 
 const Toast = ({ message }: ToastProps) => {

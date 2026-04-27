@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import type { ToastType } from '../types/toast.types'
 
 const useToast = () => {
     const [isVisible, setIsVisible] = useState(false)
-    const [message, setMessage] = useState('')
+    const [toastMessage, setMessage] = useState('')
+    const [toastType, setToastType] = useState<ToastType>('success')
 
     useEffect(() => {
         if (isVisible) {
@@ -11,12 +13,13 @@ const useToast = () => {
         }
     }, [isVisible])
 
-    const showToast = (message: string, type: 'success' | 'error') => {
+    const showToast = (message: string, type: ToastType) => {
+        setToastType(type)
         setMessage(message)
         setIsVisible(true)
     }
 
-    return { showToast, isVisible, message }
+    return { showToast, isVisible, toastMessage, toastType }
 }
 
 export default useToast

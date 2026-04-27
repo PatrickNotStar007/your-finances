@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 
 const THEMES = ['light', 'dark']
+const translateTheme = (engTheme: string) => {
+    if (engTheme === 'light') return 'светлая'
+    if (engTheme === 'dark') return 'тёмная'
+}
 
 const ThemeSelector = () => {
     const [theme, setTheme] = useState(() => {
@@ -29,10 +33,15 @@ const ThemeSelector = () => {
                 {THEMES.map((t) => (
                     <li key={t}>
                         <button
-                            onClick={() => setTheme(t)}
+                            onClick={() => {
+                                const dropdown =
+                                    document.activeElement as HTMLElement
+                                dropdown.blur()
+                                setTheme(t)
+                            }}
                             className={`${theme === t ? 'bg-primary text-primary-content' : ''}`}
                         >
-                            <span>{t}</span>
+                            <span>{translateTheme(t)}</span>
                         </button>
                     </li>
                 ))}
