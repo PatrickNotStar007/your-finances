@@ -10,6 +10,8 @@ import analyticsRouter from './routes/analytics.router'
 
 const app = express()
 
+const port = Number(ENV.PORT)
+
 app.use(cors({ origin: ENV.FRONTEND_URL, credentials: true }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -20,6 +22,6 @@ app.use('/transactions', transactionRouter)
 app.use('/analytics', analyticsRouter)
 app.use(errorHandler)
 
-app.listen(ENV.PORT, () => {
-    console.log(`Сервер запущен на порту http://localhost:${ENV.PORT}`)
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Сервер запущен на порту http://localhost:${port}`)
 })
