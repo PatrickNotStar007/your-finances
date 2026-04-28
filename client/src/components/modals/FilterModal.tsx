@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { closeModal, formatDateForInput } from '../../lib/helpers/modal.helpers'
+import { isStartDateAfterEndDate } from '../../lib/validators/date.validator'
 
 interface FormDataType {
     type?: 'income' | 'expense'
     category?: string
-    startDate?: Date | null
-    endDate?: Date | null
+    startDate?: Date
+    endDate?: Date
 }
 
 interface FilterModalProps {
@@ -13,10 +14,16 @@ interface FilterModalProps {
 }
 
 const FilterModal = ({ setFilters }: FilterModalProps) => {
+    const [isError, setIsError] = useState(false)
     const [formData, setFormData] = useState<FormDataType>({})
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (isStartDateAfterEndDate(formData.startDate, formData.endDate)) {
+            setIsError(true)
+            return
+        }
 
         const filtersToApply = { ...formData }
         setFilters(filtersToApply)
@@ -32,17 +39,25 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
         }))
     }
 
+    const handleDateChange = (
+        field: 'startDate' | 'endDate',
+        dateString: string
+    ) => {
+        setIsError(false)
+        setFormData({
+            ...formData,
+            [field]: new Date(dateString),
+        })
+    }
+
     const resetForm = () => {
-        const timer = setTimeout(
-            () =>
-                setFormData({
-                    type: undefined,
-                    category: '',
-                    startDate: null,
-                    endDate: null,
-                }),
-            300
-        )
+        const timer = setTimeout(() => {
+            setIsError(false)
+            setFormData({
+                type: undefined,
+                category: '',
+            })
+        }, 300)
         return () => clearTimeout(timer)
     }
 
@@ -84,7 +99,7 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                             <input
                                 type="text"
                                 className="input w-full focus:input-primary transition-all"
-                                value={formData.category}
+                                value={formData.category || ''}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
@@ -105,13 +120,13 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                             </label>
                             <input
                                 type="date"
-                                className="input w-full focus:input-primary transition-all"
+                                className={`input w-full focus:input-primary transition-all ${isError ? 'input-error' : ''}`}
                                 value={formatDateForInput(formData.startDate)}
                                 onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        startDate: new Date(e.target.value),
-                                    })
+                                    handleDateChange(
+                                        'startDate',
+                                        e.target.value
+                                    )
                                 }
                             />
                         </div>
@@ -123,15 +138,17 @@ const FilterModal = ({ setFilters }: FilterModalProps) => {
                             </label>
                             <input
                                 type="date"
-                                className="input w-full focus:input-primary transition-all"
+                                className={`input w-full focus:input-primary transition-all ${isError ? 'input-error' : ''}`}
                                 value={formatDateForInput(formData.endDate)}
                                 onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        endDate: new Date(e.target.value),
-                                    })
+                                    handleDateChange('endDate', e.target.value)
                                 }
                             />
+                            {isError && (
+                                <span className="text-error">
+                                    Дата конца должна быть больше даты начала
+                                </span>
+                            )}
                         </div>
 
                         {/* кнопки */}

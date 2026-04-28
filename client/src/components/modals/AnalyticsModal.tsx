@@ -3,7 +3,12 @@ import { useState } from 'react'
 import { getSummary } from '../../lib/api/summary.api'
 import { useAuth } from '../../hooks/auth.hook'
 import SummaryModal from './SummaryModal'
-import { closeModal, openModal } from '../../lib/helpers/modal.helpers'
+import {
+    closeModal,
+    formatDateForInput,
+    openModal,
+} from '../../lib/helpers/modal.helpers'
+import { isStartDateAfterEndDate } from '../../lib/validators/date.validator'
 
 interface FormData {
     startDate?: Date
@@ -54,12 +59,10 @@ const AnalyticsModal = () => {
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (
-            formData.startDate &&
-            formData.endDate &&
-            formData.startDate > formData.endDate
-        ) {
+        if (isStartDateAfterEndDate(formData.startDate, formData.endDate)) {
             setIsError(true)
+            console.log('jib,rf')
+
             return
         }
 
@@ -91,13 +94,7 @@ const AnalyticsModal = () => {
                             </label>
                             <input
                                 type="date"
-                                value={
-                                    formData.startDate
-                                        ? formData.startDate
-                                              .toISOString()
-                                              .split('T')[0]
-                                        : ''
-                                }
+                                value={formatDateForInput(formData.startDate)}
                                 className={`input ${isError ? 'input-error' : ''}`}
                                 onChange={(e) =>
                                     handleOnChange('startDate', e.target.value)
@@ -109,13 +106,7 @@ const AnalyticsModal = () => {
                             </label>
                             <input
                                 type="date"
-                                value={
-                                    formData.endDate
-                                        ? formData.endDate
-                                              .toISOString()
-                                              .split('T')[0]
-                                        : ''
-                                }
+                                value={formatDateForInput(formData.endDate)}
                                 className={`input ${isError ? 'input-error' : ''}`}
                                 onChange={(e) =>
                                     handleOnChange('endDate', e.target.value)
